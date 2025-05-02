@@ -30,8 +30,10 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         />
         
         {/* Page content */}
-        <div className="flex-1 overflow-y-auto p-4 md:p-6 pb-20 md:pb-6 fade-in">
-          {children}
+        <div className="flex-1 overflow-y-auto p-4 md:p-6 pb-20 md:pb-6">
+          <div className="animate-fadeIn">
+            {children}
+          </div>
         </div>
         
         {/* Mobile bottom navigation */}
@@ -52,9 +54,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             <i className="fas fa-smile text-lg"></i>
             <span className="text-xs mt-1">Mood</span>
           </a>
-          <a href="/settings" className={`flex flex-col items-center p-2 ${location === '/settings' ? 'text-primary dark:text-primary' : 'text-muted-foreground'}`}>
-            <i className="fas fa-cog text-lg"></i>
-            <span className="text-xs mt-1">Settings</span>
+          <a href="/mental-peace" className={`flex flex-col items-center p-2 ${location === '/mental-peace' ? 'text-primary dark:text-primary' : 'text-muted-foreground'}`}>
+            <i className="fas fa-om text-lg"></i>
+            <span className="text-xs mt-1">Peace</span>
           </a>
         </div>
       </main>
