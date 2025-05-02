@@ -101,19 +101,19 @@ const Chat: React.FC = () => {
     <div className="h-full flex flex-col max-w-4xl mx-auto">
       <h1 className="text-2xl md:text-3xl font-bold mb-6">AI Chat</h1>
       
-      <Card className="flex-1 flex flex-col overflow-hidden">
+      <Card className="flex-1 flex flex-col overflow-hidden rounded-xl shadow-lg border-2 border-primary/10">
         {/* Chat header */}
-        <div className="p-4 border-b border-border flex justify-between items-center">
+        <div className="p-4 border-b border-border flex justify-between items-center bg-gradient-to-r from-primary/10 to-secondary/10">
           <div className="flex items-center">
-            <div className="bg-primary/10 p-2 rounded-full">
-              <i className="fas fa-robot text-primary"></i>
+            <div className="bg-white dark:bg-card p-3 rounded-full shadow-sm">
+              <i className="fas fa-robot text-primary text-xl"></i>
             </div>
             <div className="ml-3">
-              <h3 className="font-medium">MindMate Assistant</h3>
+              <h3 className="font-heading font-medium text-lg">MindMate Assistant</h3>
               <p className="text-xs text-muted-foreground">AI-powered wellness support</p>
             </div>
           </div>
-          <Button variant="ghost" size="icon" onClick={handleReset} title="Reset conversation">
+          <Button variant="ghost" size="icon" onClick={handleReset} title="Reset conversation" className="rounded-full hover:bg-white/20 dark:hover:bg-card/20">
             <i className="fas fa-redo-alt"></i>
           </Button>
         </div>
@@ -126,24 +126,24 @@ const Chat: React.FC = () => {
               className={`flex items-start ${message.role === 'user' ? 'justify-end' : ''}`}
             >
               {message.role === 'assistant' && (
-                <div className="bg-primary/10 p-2 rounded-full">
-                  <i className="fas fa-robot text-primary"></i>
+                <div className="bg-white dark:bg-card p-2 rounded-full shadow-sm border border-primary/20">
+                  <i className="fas fa-robot text-primary text-lg"></i>
                 </div>
               )}
               
               <div 
-                className={`mx-3 py-2 px-4 rounded-lg max-w-[80%] ${
+                className={`mx-3 py-3 px-5 rounded-xl max-w-[80%] shadow-sm chat-message ${
                   message.role === 'user' 
-                    ? 'bg-primary text-primary-foreground rounded-br-none' 
-                    : 'bg-muted rounded-bl-none'
+                    ? 'chat-message-user bg-gradient-to-br from-primary to-secondary text-primary-foreground rounded-br-none' 
+                    : 'chat-message-ai bg-muted/50 rounded-bl-none'
                 }`}
               >
                 <p>{message.content}</p>
               </div>
               
               {message.role === 'user' && (
-                <div className="bg-muted p-2 rounded-full">
-                  <i className="fas fa-user text-muted-foreground"></i>
+                <div className="bg-gradient-to-br from-primary to-secondary p-2 rounded-full shadow-sm">
+                  <i className="fas fa-user text-white text-lg"></i>
                 </div>
               )}
             </div>
@@ -153,19 +153,23 @@ const Chat: React.FC = () => {
         
         {/* Chat input */}
         <div className="p-4 border-t border-border">
-          <form onSubmit={handleSubmit} className="flex items-center space-x-2">
+          <form onSubmit={handleSubmit} className="flex items-center space-x-3">
             <Input
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="Type your message..."
               disabled={isProcessing}
-              className="flex-1"
+              className="flex-1 h-12 pl-4 pr-4 border-2 border-primary/10 focus-visible:ring-primary/30 rounded-full text-lg"
             />
-            <Button type="submit" disabled={isProcessing}>
+            <Button 
+              type="submit" 
+              disabled={isProcessing}
+              className="btn rounded-full h-12 w-12 p-0 bg-gradient-to-r from-primary to-secondary hover:shadow-lg text-white"
+            >
               {isProcessing ? (
-                <i className="fas fa-spinner fa-spin"></i>
+                <i className="fas fa-spinner fa-spin text-lg"></i>
               ) : (
-                <i className="fas fa-paper-plane"></i>
+                <i className="fas fa-paper-plane text-lg"></i>
               )}
             </Button>
           </form>
