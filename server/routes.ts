@@ -5,8 +5,12 @@ import OpenAI from "openai";
 
 // Initialize OpenAI client
 const openai = new OpenAI({ 
-  apiKey: process.env.OPENAI_API_KEY || "DEMO_KEY" 
+  apiKey: process.env.OPENAI_API_KEY
 });
+
+if (!process.env.OPENAI_API_KEY) {
+  console.error("WARNING: OPENAI_API_KEY is not set. AI features will not work.");
+}
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // AI routes for MindMate
