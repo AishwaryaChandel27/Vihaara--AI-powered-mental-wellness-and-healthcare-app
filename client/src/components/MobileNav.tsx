@@ -13,8 +13,8 @@ const MobileNav: React.FC<MobileNavProps> = ({ isOpen, toggleMenu, currentPath }
       {/* Mobile header */}
       <header className="md:hidden bg-background dark:bg-card shadow-sm border-b border-border p-4 flex items-center justify-between">
         <div className="flex items-center space-x-2">
-          <span className="text-primary text-xl"><i className="fas fa-brain"></i></span>
-          <h1 className="text-lg font-bold text-primary">MindMate AI</h1>
+          <span className="text-primary text-xl"><i className="fas fa-om"></i></span>
+          <h1 className="text-lg font-bold bg-gradient-to-r from-primary to-secondary inline-block text-transparent bg-clip-text">Vihaara</h1>
         </div>
         <button onClick={toggleMenu} className="text-muted-foreground">
           <i className="fas fa-bars"></i>

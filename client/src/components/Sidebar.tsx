@@ -7,8 +7,8 @@ const Sidebar = () => {
   return (
     <aside className="hidden md:flex md:w-64 flex-col bg-background dark:bg-card border-r border-border shadow-sm">
       <div className="p-4 border-b border-border flex items-center space-x-2">
-        <span className="text-primary text-2xl"><i className="fas fa-brain"></i></span>
-        <h1 className="text-xl font-bold text-primary">MindMate AI</h1>
+        <span className="text-primary text-2xl"><i className="fas fa-om"></i></span>
+        <h1 className="text-xl font-bold bg-gradient-to-r from-primary to-secondary inline-block text-transparent bg-clip-text">Vihaara</h1>
       </div>
       
       <nav className="flex-1 p-4 space-y-1">
