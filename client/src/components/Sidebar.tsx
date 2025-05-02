@@ -57,6 +57,28 @@ const Sidebar = () => {
           <span>Mood Tracker</span>
         </a>
         <a 
+          href="/health-advice" 
+          className={`flex items-center space-x-2 p-2 rounded-lg ${
+            location === '/health-advice' 
+              ? 'bg-primary/10 text-primary' 
+              : 'hover:bg-muted text-muted-foreground hover:text-foreground'
+          }`}
+        >
+          <i className="fas fa-heart w-5 h-5"></i>
+          <span>Health Advice</span>
+        </a>
+        <a 
+          href="/mental-peace" 
+          className={`flex items-center space-x-2 p-2 rounded-lg ${
+            location === '/mental-peace' 
+              ? 'bg-primary/10 text-primary' 
+              : 'hover:bg-muted text-muted-foreground hover:text-foreground'
+          }`}
+        >
+          <i className="fas fa-om w-5 h-5"></i>
+          <span>Mental Peace</span>
+        </a>
+        <a 
           href="/about" 
           className={`flex items-center space-x-2 p-2 rounded-lg ${
             location === '/about' 

@@ -10,6 +10,8 @@ import Home from "@/pages/Home";
 import Journal from "@/pages/Journal";
 import Chat from "@/pages/Chat";
 import Mood from "@/pages/Mood";
+import HealthAdvice from "@/pages/HealthAdvice";
+import MentalPeace from "@/pages/MentalPeace";
 import About from "@/pages/About";
 import Settings from "@/pages/Settings";
 
@@ -21,6 +23,8 @@ function Router() {
         <Route path="/journal" component={Journal} />
         <Route path="/chat" component={Chat} />
         <Route path="/mood" component={Mood} />
+        <Route path="/health-advice" component={HealthAdvice} />
+        <Route path="/mental-peace" component={MentalPeace} />
         <Route path="/about" component={About} />
         <Route path="/settings" component={Settings} />
         <Route component={NotFound} />

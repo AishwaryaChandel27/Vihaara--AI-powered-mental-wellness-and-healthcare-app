@@ -134,6 +134,134 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Health advice endpoint
+  app.post("/api/ai/health-advice", async (req, res) => {
+    try {
+      const { category, tone } = req.body;
+      
+      if (!category) {
+        return res.status(400).json({ error: "Category is required" });
+      }
+      
+      let toneInstruction = "Use a friendly, conversational tone.";
+      switch (tone) {
+        case 'clinical':
+          toneInstruction = "Use a clinical, objective tone with medical accuracy. Focus on evidence-based practices and healthcare information.";
+          break;
+        case 'spiritual':
+          toneInstruction = "Use a mindful, spiritual tone that emphasizes inner peace, meditation, and harmony with nature. Include concepts of mindfulness and spiritual well-being.";
+          break;
+      }
+      
+      let categoryPrompt = "";
+      switch (category) {
+        case 'general':
+          categoryPrompt = "general wellness and overall physical health";
+          break;
+        case 'diet':
+          categoryPrompt = "nutrition, healthy eating habits, and dietary best practices";
+          break;
+        case 'sleep':
+          categoryPrompt = "sleep hygiene, quality rest, and healthy sleep patterns";
+          break;
+        case 'hydration':
+          categoryPrompt = "proper hydration, water intake, and fluid balance";
+          break;
+        case 'posture':
+          categoryPrompt = "proper posture, ergonomics, and body alignment";
+          break;
+        default:
+          categoryPrompt = "general wellness and physical health";
+      }
+      
+      // Call OpenAI API for health advice
+      const response = await openai.chat.completions.create({
+        model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+        messages: [
+          {
+            role: "system",
+            content: `You are MindMate AI, a wellness assistant. ${toneInstruction} Provide practical, evidence-based advice about ${categoryPrompt}. Give 3-5 actionable tips formatted with bullet points. Each tip should have a brief explanation. Respond in a clear, helpful manner.`
+          },
+          {
+            role: "user",
+            content: `I would like some advice about ${categoryPrompt}. What are some practical tips I can incorporate into my daily life?`
+          }
+        ]
+      });
+      
+      return res.json({
+        advice: response.choices[0].message.content || 'I apologize, but I could not generate health advice at this time. Please try again.'
+      });
+    } catch (error) {
+      console.error("Error generating health advice:", error);
+      res.status(500).json({ error: "Failed to generate health advice" });
+    }
+  });
+  
+  // Mental peace techniques endpoint
+  app.post("/api/ai/mental-peace", async (req, res) => {
+    try {
+      const { category, tone } = req.body;
+      
+      if (!category) {
+        return res.status(400).json({ error: "Category is required" });
+      }
+      
+      let toneInstruction = "Use a friendly, conversational tone.";
+      switch (tone) {
+        case 'clinical':
+          toneInstruction = "Use a clinical, objective tone with medical accuracy. Focus on evidence-based practices and healthcare information.";
+          break;
+        case 'spiritual':
+          toneInstruction = "Use a mindful, spiritual tone that emphasizes inner peace, meditation, and harmony with nature. Include concepts of mindfulness and spiritual well-being.";
+          break;
+      }
+      
+      let categoryPrompt = "";
+      switch (category) {
+        case 'mindfulness':
+          categoryPrompt = "mindfulness and present-moment awareness practices";
+          break;
+        case 'stress':
+          categoryPrompt = "stress reduction and anxiety management techniques";
+          break;
+        case 'breathing':
+          categoryPrompt = "breathing exercises for relaxation and centering";
+          break;
+        case 'affirmations':
+          categoryPrompt = "positive affirmations and self-talk for mental well-being";
+          break;
+        case 'meditation':
+          categoryPrompt = "meditation practices for inner peace and mental clarity";
+          break;
+        default:
+          categoryPrompt = "mindfulness and mental well-being";
+      }
+      
+      // Call OpenAI API for mental peace technique
+      const response = await openai.chat.completions.create({
+        model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+        messages: [
+          {
+            role: "system",
+            content: `You are MindMate AI, a mental wellness assistant. ${toneInstruction} Provide a practical technique for ${categoryPrompt}. Include step-by-step instructions on how to practice it, when to use it, and what benefits to expect. Make the technique accessible for beginners. Use paragraphs and bullet points for clear formatting.`
+          },
+          {
+            role: "user",
+            content: `I would like to learn a technique for ${categoryPrompt}. Can you share a practice I could try today?`
+          }
+        ]
+      });
+      
+      return res.json({
+        technique: response.choices[0].message.content || 'I apologize, but I could not generate a mental peace technique at this time. Please try again.'
+      });
+    } catch (error) {
+      console.error("Error generating mental peace technique:", error);
+      res.status(500).json({ error: "Failed to generate mental peace technique" });
+    }
+  });
+  
   // Daily tip endpoint
   app.post("/api/ai/daily-tip", async (req, res) => {
     try {

@@ -103,3 +103,47 @@ export async function getDailyWellnessTip(tone: string) {
     throw error;
   }
 }
+
+export async function getAiHealthAdvice(category: string, tone: string) {
+  try {
+    const response = await fetch(`${API_ENDPOINT}/health-advice`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ category, tone })
+    });
+    
+    if (!response.ok) {
+      throw new Error(`API Error: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    return data.advice;
+  } catch (error) {
+    console.error('Error getting health advice:', error);
+    throw error;
+  }
+}
+
+export async function getAiMentalPeaceTechnique(category: string, tone: string) {
+  try {
+    const response = await fetch(`${API_ENDPOINT}/mental-peace`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ category, tone })
+    });
+    
+    if (!response.ok) {
+      throw new Error(`API Error: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    return data.technique;
+  } catch (error) {
+    console.error('Error getting mental peace technique:', error);
+    throw error;
+  }
+}
