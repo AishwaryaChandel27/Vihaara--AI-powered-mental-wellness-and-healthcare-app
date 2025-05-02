@@ -10,19 +10,19 @@ const openai = new OpenAI({
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // AI routes for MindMate
-  
+
   // Journal analysis endpoint
   app.post("/api/ai/analyze-journal", async (req, res) => {
     try {
       const { content } = req.body;
-      
+
       if (!content || typeof content !== "string") {
         return res.status(400).json({ error: "Journal content is required" });
       }
-      
+
       // Call OpenAI API for journal analysis
       const response = await openai.chat.completions.create({
-        model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+        model: "gpt-4", // Using latest GPT-4 model
         messages: [
           {
             role: "system",
@@ -35,9 +35,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ],
         response_format: { type: "json_object" }
       });
-      
+
       const result = JSON.parse(response.choices[0].message.content || '{}');
-      
+
       return res.json({
         insights: result.insights || '',
         tags: result.tags || []
@@ -47,19 +47,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to analyze journal entry" });
     }
   });
-  
+
   // Mood insights endpoint
   app.post("/api/ai/mood-insights", async (req, res) => {
     try {
       const { entries } = req.body;
-      
+
       if (!entries || !Array.isArray(entries)) {
         return res.status(400).json({ error: "Mood entries are required" });
       }
-      
+
       // Call OpenAI API for mood analysis
       const response = await openai.chat.completions.create({
-        model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+        model: "gpt-4", // Using latest GPT-4 model
         messages: [
           {
             role: "system",
@@ -72,9 +72,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ],
         response_format: { type: "json_object" }
       });
-      
+
       const result = JSON.parse(response.choices[0].message.content || '{}');
-      
+
       return res.json({
         insights: result.insights || ''
       });
@@ -83,23 +83,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to generate mood insights" });
     }
   });
-  
+
   // Chat endpoint
   app.post("/api/ai/chat", async (req, res) => {
     try {
       const { messages, tone, responseLength } = req.body;
-      
+
       if (!messages || !Array.isArray(messages)) {
         return res.status(400).json({ error: "Chat messages are required" });
       }
-      
+
       let lengthInstruction = "Keep your responses balanced in length.";
       if (responseLength === 1) {
         lengthInstruction = "Keep your responses brief and concise.";
       } else if (responseLength === 3) {
         lengthInstruction = "Provide detailed, thorough responses.";
       }
-      
+
       let toneInstruction = "Use a friendly, conversational tone.";
       switch (tone) {
         case 'clinical':
@@ -109,22 +109,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
           toneInstruction = "Use a mindful, spiritual tone that emphasizes inner peace, meditation, and harmony with nature. Include concepts of mindfulness and spiritual well-being.";
           break;
       }
-      
+
       // Add system message for wellness context
       const systemMessage = {
         role: "system",
         content: `You are MindMate AI, a mental wellness assistant. ${toneInstruction} ${lengthInstruction} Always prioritize user well-being and safety. For serious mental health concerns, suggest seeking professional help.`
       };
-      
+
       // Format the messages array for OpenAI
       const formattedMessages = [systemMessage, ...messages];
-      
+
       // Call OpenAI API for chat response
       const response = await openai.chat.completions.create({
-        model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+        model: "gpt-4", // Using latest GPT-4 model
         messages: formattedMessages
       });
-      
+
       return res.json({
         response: response.choices[0].message.content || 'I apologize, but I could not generate a response at this time. Please try again.'
       });
@@ -133,16 +133,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to generate chat response" });
     }
   });
-  
+
   // Health advice endpoint
   app.post("/api/ai/health-advice", async (req, res) => {
     try {
       const { category, tone } = req.body;
-      
+
       if (!category) {
         return res.status(400).json({ error: "Category is required" });
       }
-      
+
       let toneInstruction = "Use a friendly, conversational tone.";
       switch (tone) {
         case 'clinical':
@@ -152,7 +152,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           toneInstruction = "Use a mindful, spiritual tone that emphasizes inner peace, meditation, and harmony with nature. Include concepts of mindfulness and spiritual well-being.";
           break;
       }
-      
+
       let categoryPrompt = "";
       switch (category) {
         case 'general':
@@ -173,10 +173,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         default:
           categoryPrompt = "general wellness and physical health";
       }
-      
+
       // Call OpenAI API for health advice
       const response = await openai.chat.completions.create({
-        model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+        model: "gpt-4", // Using latest GPT-4 model
         messages: [
           {
             role: "system",
@@ -188,7 +188,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           }
         ]
       });
-      
+
       return res.json({
         advice: response.choices[0].message.content || 'I apologize, but I could not generate health advice at this time. Please try again.'
       });
@@ -197,16 +197,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to generate health advice" });
     }
   });
-  
+
   // Mental peace techniques endpoint
   app.post("/api/ai/mental-peace", async (req, res) => {
     try {
       const { category, tone } = req.body;
-      
+
       if (!category) {
         return res.status(400).json({ error: "Category is required" });
       }
-      
+
       let toneInstruction = "Use a friendly, conversational tone.";
       switch (tone) {
         case 'clinical':
@@ -216,7 +216,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           toneInstruction = "Use a mindful, spiritual tone that emphasizes inner peace, meditation, and harmony with nature. Include concepts of mindfulness and spiritual well-being.";
           break;
       }
-      
+
       let categoryPrompt = "";
       switch (category) {
         case 'mindfulness':
@@ -237,10 +237,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         default:
           categoryPrompt = "mindfulness and mental well-being";
       }
-      
+
       // Call OpenAI API for mental peace technique
       const response = await openai.chat.completions.create({
-        model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+        model: "gpt-4", // Using latest GPT-4 model
         messages: [
           {
             role: "system",
@@ -252,7 +252,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           }
         ]
       });
-      
+
       return res.json({
         technique: response.choices[0].message.content || 'I apologize, but I could not generate a mental peace technique at this time. Please try again.'
       });
@@ -261,12 +261,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to generate mental peace technique" });
     }
   });
-  
+
   // Daily tip endpoint
   app.post("/api/ai/daily-tip", async (req, res) => {
     try {
       const { tone } = req.body;
-      
+
       let toneInstruction = "Use a friendly, conversational tone.";
       switch (tone) {
         case 'clinical':
@@ -276,10 +276,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
           toneInstruction = "Use a mindful, spiritual tone that emphasizes inner peace, meditation, and harmony with nature. Include concepts of mindfulness and spiritual well-being.";
           break;
       }
-      
+
       // Call OpenAI API for daily tip
       const response = await openai.chat.completions.create({
-        model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+        model: "gpt-4", // Using latest GPT-4 model
         messages: [
           {
             role: "system",
@@ -292,9 +292,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ],
         response_format: { type: "json_object" }
       });
-      
+
       const result = JSON.parse(response.choices[0].message.content || '{}');
-      
+
       return res.json({
         tip: result.tip || 'Take a moment to breathe deeply and center yourself.'
       });
