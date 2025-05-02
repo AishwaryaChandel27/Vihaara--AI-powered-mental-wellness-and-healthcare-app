@@ -65,6 +65,26 @@ const MobileNav: React.FC<MobileNavProps> = ({ isOpen, toggleMenu, currentPath }
             <i className="fas fa-smile mr-2"></i> Mood Tracker
           </a>
           <a 
+            href="/health-advice" 
+            className={`block p-2 rounded-lg ${
+              currentPath === '/health-advice' 
+                ? 'bg-primary/10 text-primary' 
+                : 'hover:bg-muted text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            <i className="fas fa-heart mr-2"></i> Health Advice
+          </a>
+          <a 
+            href="/mental-peace" 
+            className={`block p-2 rounded-lg ${
+              currentPath === '/mental-peace' 
+                ? 'bg-primary/10 text-primary' 
+                : 'hover:bg-muted text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            <i className="fas fa-om mr-2"></i> Mental Peace
+          </a>
+          <a 
             href="/about" 
             className={`block p-2 rounded-lg ${
               currentPath === '/about' 
