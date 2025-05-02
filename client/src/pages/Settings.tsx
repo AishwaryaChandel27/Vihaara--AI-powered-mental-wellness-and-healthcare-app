@@ -76,7 +76,7 @@ const Settings: React.FC = () => {
             <p className="text-sm text-muted-foreground mb-3">Choose how your AI assistant communicates with you</p>
             
             <RadioGroup value={aiTone} onValueChange={(value) => setAiTone(value as any)}>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
                 <div className={`p-3 border rounded-lg cursor-pointer ${aiTone === 'friendly' ? 'bg-primary/10 border-primary' : 'border-border'}`}>
                   <RadioGroupItem value="friendly" id="friendly" className="sr-only" />
                   <Label htmlFor="friendly" className="cursor-pointer flex items-center">
@@ -87,26 +87,6 @@ const Settings: React.FC = () => {
                   </Label>
                 </div>
                 
-                <div className={`p-3 border rounded-lg cursor-pointer ${aiTone === 'professional' ? 'bg-primary/10 border-primary' : 'border-border'}`}>
-                  <RadioGroupItem value="professional" id="professional" className="sr-only" />
-                  <Label htmlFor="professional" className="cursor-pointer flex items-center">
-                    <span className={`w-4 h-4 mr-2 rounded-full border ${aiTone === 'professional' ? 'border-primary' : 'border-muted-foreground'} flex items-center justify-center`}>
-                      {aiTone === 'professional' && <span className="w-2 h-2 bg-primary rounded-full"></span>}
-                    </span>
-                    Professional
-                  </Label>
-                </div>
-                
-                <div className={`p-3 border rounded-lg cursor-pointer ${aiTone === 'supportive' ? 'bg-primary/10 border-primary' : 'border-border'}`}>
-                  <RadioGroupItem value="supportive" id="supportive" className="sr-only" />
-                  <Label htmlFor="supportive" className="cursor-pointer flex items-center">
-                    <span className={`w-4 h-4 mr-2 rounded-full border ${aiTone === 'supportive' ? 'border-primary' : 'border-muted-foreground'} flex items-center justify-center`}>
-                      {aiTone === 'supportive' && <span className="w-2 h-2 bg-primary rounded-full"></span>}
-                    </span>
-                    Supportive
-                  </Label>
-                </div>
-                
                 <div className={`p-3 border rounded-lg cursor-pointer ${aiTone === 'clinical' ? 'bg-primary/10 border-primary' : 'border-border'}`}>
                   <RadioGroupItem value="clinical" id="clinical" className="sr-only" />
                   <Label htmlFor="clinical" className="cursor-pointer flex items-center">
@@ -114,6 +94,16 @@ const Settings: React.FC = () => {
                       {aiTone === 'clinical' && <span className="w-2 h-2 bg-primary rounded-full"></span>}
                     </span>
                     Clinical
+                  </Label>
+                </div>
+                
+                <div className={`p-3 border rounded-lg cursor-pointer ${aiTone === 'spiritual' ? 'bg-primary/10 border-primary' : 'border-border'}`}>
+                  <RadioGroupItem value="spiritual" id="spiritual" className="sr-only" />
+                  <Label htmlFor="spiritual" className="cursor-pointer flex items-center">
+                    <span className={`w-4 h-4 mr-2 rounded-full border ${aiTone === 'spiritual' ? 'border-primary' : 'border-muted-foreground'} flex items-center justify-center`}>
+                      {aiTone === 'spiritual' && <span className="w-2 h-2 bg-primary rounded-full"></span>}
+                    </span>
+                    Spiritual
                   </Label>
                 </div>
               </div>

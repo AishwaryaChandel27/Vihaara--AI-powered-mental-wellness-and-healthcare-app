@@ -36,11 +36,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         response_format: { type: "json_object" }
       });
       
-      const result = JSON.parse(response.choices[0].message.content);
+      const result = JSON.parse(response.choices[0].message.content || '{}');
       
       return res.json({
-        insights: result.insights,
-        tags: result.tags
+        insights: result.insights || '',
+        tags: result.tags || []
       });
     } catch (error) {
       console.error("Error analyzing journal:", error);
@@ -73,10 +73,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         response_format: { type: "json_object" }
       });
       
-      const result = JSON.parse(response.choices[0].message.content);
+      const result = JSON.parse(response.choices[0].message.content || '{}');
       
       return res.json({
-        insights: result.insights
+        insights: result.insights || ''
       });
     } catch (error) {
       console.error("Error generating mood insights:", error);
@@ -102,14 +102,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       let toneInstruction = "Use a friendly, conversational tone.";
       switch (tone) {
-        case 'professional':
-          toneInstruction = "Use a professional, informative tone.";
-          break;
-        case 'supportive':
-          toneInstruction = "Use a warm, empathetic, and supportive tone.";
-          break;
         case 'clinical':
-          toneInstruction = "Use a clinical, objective tone with medical accuracy.";
+          toneInstruction = "Use a clinical, objective tone with medical accuracy. Focus on evidence-based practices and healthcare information.";
+          break;
+        case 'spiritual':
+          toneInstruction = "Use a mindful, spiritual tone that emphasizes inner peace, meditation, and harmony with nature. Include concepts of mindfulness and spiritual well-being.";
           break;
       }
       
@@ -129,7 +126,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
       
       return res.json({
-        response: response.choices[0].message.content
+        response: response.choices[0].message.content || 'I apologize, but I could not generate a response at this time. Please try again.'
       });
     } catch (error) {
       console.error("Error generating chat response:", error);
@@ -144,14 +141,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       let toneInstruction = "Use a friendly, conversational tone.";
       switch (tone) {
-        case 'professional':
-          toneInstruction = "Use a professional, informative tone.";
-          break;
-        case 'supportive':
-          toneInstruction = "Use a warm, empathetic, and supportive tone.";
-          break;
         case 'clinical':
-          toneInstruction = "Use a clinical, objective tone with medical accuracy.";
+          toneInstruction = "Use a clinical, objective tone with medical accuracy. Focus on evidence-based practices and healthcare information.";
+          break;
+        case 'spiritual':
+          toneInstruction = "Use a mindful, spiritual tone that emphasizes inner peace, meditation, and harmony with nature. Include concepts of mindfulness and spiritual well-being.";
           break;
       }
       
@@ -171,10 +165,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         response_format: { type: "json_object" }
       });
       
-      const result = JSON.parse(response.choices[0].message.content);
+      const result = JSON.parse(response.choices[0].message.content || '{}');
       
       return res.json({
-        tip: result.tip
+        tip: result.tip || 'Take a moment to breathe deeply and center yourself.'
       });
     } catch (error) {
       console.error("Error generating daily tip:", error);

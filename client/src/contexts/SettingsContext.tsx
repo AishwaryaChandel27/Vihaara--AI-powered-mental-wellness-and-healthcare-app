@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
 type ThemeType = 'light' | 'dark';
-type AiToneType = 'friendly' | 'professional' | 'supportive' | 'clinical';
+type AiToneType = 'friendly' | 'clinical' | 'spiritual';
 
 interface SettingsContextType {
   theme: ThemeType;
