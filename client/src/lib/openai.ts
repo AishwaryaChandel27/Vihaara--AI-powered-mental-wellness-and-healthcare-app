@@ -1,49 +1,48 @@
 import { ChatMessage, MoodEntry } from '@/types';
 
-// For browser-based app, we'll proxy OpenAI calls through our server
-const API_ENDPOINT = '/api/ai';
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY!;
+const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
 
-export async function getAiJournalAnalysis(journalContent: string) {
-  try {
-    const response = await fetch(`${API_ENDPOINT}/analyze-journal`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ content: journalContent })
-    });
-    
-    if (!response.ok) {
-      throw new Error(`API Error: ${response.status}`);
-    }
-    
-    return await response.json();
-  } catch (error) {
-    console.error('Error analyzing journal:', error);
-    throw error;
+async function callOpenAi(messages: { role: string; content: string }[], temperature = 0.7, max_tokens = 500) {
+  const response = await fetch(OPENAI_API_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${OPENAI_API_KEY}`,
+    },
+    body: JSON.stringify({
+      model: 'gpt-4', // or 'gpt-3.5-turbo'
+      messages,
+      temperature,
+      max_tokens,
+    }),
+  });
+
+  if (!response.ok) {
+    const error = await response.text();
+    throw new Error(`OpenAI API error: ${response.status} - ${error}`);
   }
+
+  const data = await response.json();
+  return data.choices[0].message.content;
+}
+
+// Example function for journal analysis
+export async function getAiJournalAnalysis(journalContent: string) {
+  const messages = [
+    { role: 'system', content: 'You are a helpful mental health assistant.' },
+    { role: 'user', content: `Analyze this journal entry and provide emotional insights:\n\n${journalContent}` },
+  ];
+  return await callOpenAi(messages);
 }
 
 export async function getMoodInsightAnalysis(moodEntries: MoodEntry[]) {
-  try {
-    const response = await fetch(`${API_ENDPOINT}/mood-insights`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ entries: moodEntries })
-    });
-    
-    if (!response.ok) {
-      throw new Error(`API Error: ${response.status}`);
-    }
-    
-    const data = await response.json();
-    return data.insights;
-  } catch (error) {
-    console.error('Error getting mood insights:', error);
-    throw error;
-  }
+  const formatted = moodEntries.map((entry, idx) => `Entry ${idx + 1}: ${JSON.stringify(entry)}`).join('\n');
+  const messages = [
+    { role: 'system', content: 'You are an emotional wellness analyst.' },
+    { role: 'user', content: `Analyze these mood entries and summarize patterns:\n\n${formatted}` },
+  ];
+  return await callOpenAi(messages);
 }
 
 export async function getAiChatResponse(
@@ -51,99 +50,33 @@ export async function getAiChatResponse(
   tone: string,
   responseLength: number
 ) {
-  try {
-    // Format messages for OpenAI API format
-    const formattedMessages = messages.map(msg => ({
-      role: msg.role,
-      content: msg.content
-    }));
-    
-    const response = await fetch(`${API_ENDPOINT}/chat`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ 
-        messages: formattedMessages,
-        tone,
-        responseLength 
-      })
-    });
-    
-    if (!response.ok) {
-      throw new Error(`API Error: ${response.status}`);
-    }
-    
-    const data = await response.json();
-    return data.response;
-  } catch (error) {
-    console.error('Error getting chat response:', error);
-    throw error;
-  }
+  const prompt = [
+    { role: 'system', content: `You are a chatbot. Maintain a ${tone} tone and reply in about ${responseLength} words.` },
+    ...messages.map(msg => ({ role: msg.role, content: msg.content })),
+  ];
+  return await callOpenAi(prompt, 0.7, responseLength * 2); // adjust token length
 }
 
 export async function getDailyWellnessTip(tone: string) {
-  try {
-    const response = await fetch(`${API_ENDPOINT}/daily-tip`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ tone })
-    });
-    
-    if (!response.ok) {
-      throw new Error(`API Error: ${response.status}`);
-    }
-    
-    const data = await response.json();
-    return data.tip;
-  } catch (error) {
-    console.error('Error getting daily tip:', error);
-    throw error;
-  }
+  const messages = [
+    { role: 'system', content: `You are a wellness coach. Give a short daily wellness tip in a ${tone} tone.` },
+    { role: 'user', content: 'Give me a wellness tip for today.' },
+  ];
+  return await callOpenAi(messages, 0.6, 100);
 }
 
 export async function getAiHealthAdvice(category: string, tone: string) {
-  try {
-    const response = await fetch(`${API_ENDPOINT}/health-advice`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ category, tone })
-    });
-    
-    if (!response.ok) {
-      throw new Error(`API Error: ${response.status}`);
-    }
-    
-    const data = await response.json();
-    return data.advice;
-  } catch (error) {
-    console.error('Error getting health advice:', error);
-    throw error;
-  }
+  const messages = [
+    { role: 'system', content: `You are a healthcare advisor. Provide concise advice for the category "${category}" in a ${tone} tone.` },
+    { role: 'user', content: `I need advice on: ${category}` },
+  ];
+  return await callOpenAi(messages, 0.7, 200);
 }
 
 export async function getAiMentalPeaceTechnique(category: string, tone: string) {
-  try {
-    const response = await fetch(`${API_ENDPOINT}/mental-peace`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ category, tone })
-    });
-    
-    if (!response.ok) {
-      throw new Error(`API Error: ${response.status}`);
-    }
-    
-    const data = await response.json();
-    return data.technique;
-  } catch (error) {
-    console.error('Error getting mental peace technique:', error);
-    throw error;
-  }
+  const messages = [
+    { role: 'system', content: `You are a meditation coach. Give a mental peace technique for "${category}" in a ${tone} tone.` },
+    { role: 'user', content: `I want to calm my mind using techniques in the category: ${category}` },
+  ];
+  return await callOpenAi(messages, 0.7, 200);
 }
