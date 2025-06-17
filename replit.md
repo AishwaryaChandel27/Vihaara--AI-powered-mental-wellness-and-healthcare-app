@@ -58,9 +58,11 @@ Vihaara is a privacy-focused mental wellness application that serves as a person
 ### AI Integration Flow
 1. User triggers AI feature (journal analysis, chat, wellness tips)
 2. Frontend makes API call to Express backend with user content
-3. Backend processes request through OpenAI API with configured prompts
-4. Fallback content system activates if AI service unavailable
-5. Response returned to frontend and optionally cached locally
+3. Backend processes request through dual AI system:
+   - First attempts OpenAI GPT-4o 
+   - Falls back to Google Gemini AI if OpenAI fails
+   - Uses local fallback content if both AI services unavailable
+4. Response returned to frontend and optionally cached locally
 
 ### Settings Management
 1. User preferences stored in localStorage and React Context
@@ -79,8 +81,8 @@ Vihaara is a privacy-focused mental wellness application that serves as a person
 - **Development**: TypeScript, Vite, ESBuild for production builds
 
 ### Runtime Services
-- **OpenAI API**: Required for AI features (journaling analysis, chat, wellness tips)
-- **Environment Variables**: OPENAI_API_KEY for AI functionality, DATABASE_URL for future database integration
+- **Dual AI System**: OpenAI GPT-4o with Google Gemini AI fallback for reliability
+- **Environment Variables**: OPENAI_API_KEY and GEMINI_API_KEY for AI functionality, DATABASE_URL for future database integration
 
 ## Deployment Strategy
 
@@ -103,7 +105,8 @@ Vihaara is a privacy-focused mental wellness application that serves as a person
 
 ```
 Changelog:
-- June 17, 2025. Initial setup
+- June 17, 2025. Initial setup and project migration to Replit environment
+- June 17, 2025. Implemented dual AI system with OpenAI GPT-4o and Google Gemini AI fallback for improved reliability
 ```
 
 ## User Preferences
