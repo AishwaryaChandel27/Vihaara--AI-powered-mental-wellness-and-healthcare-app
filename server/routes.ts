@@ -34,7 +34,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Call OpenAI API for journal analysis
       const response = await openai.chat.completions.create({
-        model: "gpt-3.5-turbo", // Using GPT-3.5 Turbo model
+        model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
         messages: [
           {
             role: "system",
@@ -76,7 +76,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Call OpenAI API for mood analysis
       const response = await openai.chat.completions.create({
-        model: "gpt-3.5-turbo", // Using GPT-3.5 Turbo model
+        model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
         messages: [
           {
             role: "system",
@@ -141,7 +141,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Call OpenAI API for chat response
       const response = await openai.chat.completions.create({
-        model: "gpt-3.5-turbo", // Using GPT-3.5 Turbo model
+        model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
         messages: formattedMessages
       });
 
@@ -199,7 +199,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Call OpenAI API for health advice
       const response = await openai.chat.completions.create({
-        model: "gpt-3.5-turbo", // Using GPT-3.5 Turbo model
+        model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
         messages: [
           {
             role: "system",
@@ -266,7 +266,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Call OpenAI API for mental peace technique
       const response = await openai.chat.completions.create({
-        model: "gpt-3.5-turbo", // Using GPT-3.5 Turbo model
+        model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
         messages: [
           {
             role: "system",
@@ -308,7 +308,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Call OpenAI API for daily tip
       const response = await openai.chat.completions.create({
-        model: "gpt-3.5-turbo", // Using GPT-3.5 Turbo model
+        model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
         messages: [
           {
             role: "system",
