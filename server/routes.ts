@@ -46,9 +46,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         insights: result.insights || '',
         tags: result.tags || []
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error analyzing journal:", error);
-      res.status(500).json({ error: "Failed to analyze journal entry" });
+      
+      if (error.code === 'insufficient_quota') {
+        return res.json({
+          insights: "Your journal entry has been saved. AI analysis is temporarily unavailable due to API quota limits. Please check your OpenAI account billing or try again later.",
+          tags: ["reflection", "mindfulness"]
+        });
+      }
+      
+      return res.json({
+        insights: "Your journal entry has been saved successfully. AI analysis is temporarily unavailable.",
+        tags: ["reflection"]
+      });
     }
   });
 
@@ -82,9 +93,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return res.json({
         insights: result.insights || ''
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error generating mood insights:", error);
-      res.status(500).json({ error: "Failed to generate mood insights" });
+      
+      if (error.code === 'insufficient_quota') {
+        return res.json({
+          insights: "Your mood data has been saved. AI insights are temporarily unavailable due to API quota limits. Please check your OpenAI account billing or try again later."
+        });
+      }
+      
+      return res.json({
+        insights: "Your mood data has been saved successfully. AI insights are temporarily unavailable."
+      });
     }
   });
 
@@ -132,9 +152,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return res.json({
         response: response.choices[0].message.content || 'I apologize, but I could not generate a response at this time. Please try again.'
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error generating chat response:", error);
-      res.status(500).json({ error: "Failed to generate chat response" });
+      
+      if (error.code === 'insufficient_quota') {
+        return res.json({
+          response: "I'm temporarily unavailable due to API quota limits. Please check your OpenAI account billing or try again later. In the meantime, feel free to use the journal and mood tracking features!"
+        });
+      }
+      
+      return res.json({
+        response: "I'm temporarily unavailable right now. Please try again in a few moments, or use the other wellness features in the app."
+      });
     }
   });
 
@@ -196,9 +225,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return res.json({
         advice: response.choices[0].message.content || 'I apologize, but I could not generate health advice at this time. Please try again.'
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error generating health advice:", error);
-      res.status(500).json({ error: "Failed to generate health advice" });
+      
+      if (error.code === 'insufficient_quota') {
+        return res.json({
+          advice: "AI health advice is temporarily unavailable due to API quota limits. Please check your OpenAI account billing or try again later. For immediate health concerns, please consult with a healthcare professional."
+        });
+      }
+      
+      return res.json({
+        advice: "AI health advice is temporarily unavailable. Please consult with a healthcare professional for personalized guidance."
+      });
     }
   });
 
@@ -260,9 +298,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return res.json({
         technique: response.choices[0].message.content || 'I apologize, but I could not generate a mental peace technique at this time. Please try again.'
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error generating mental peace technique:", error);
-      res.status(500).json({ error: "Failed to generate mental peace technique" });
+      
+      if (error.code === 'insufficient_quota') {
+        return res.json({
+          technique: "AI-generated techniques are temporarily unavailable due to API quota limits. Please check your OpenAI account billing or try again later. In the meantime, try this simple breathing exercise: Breathe in for 4 counts, hold for 4 counts, breathe out for 4 counts. Repeat 5 times."
+        });
+      }
+      
+      return res.json({
+        technique: "AI-generated techniques are temporarily unavailable. Try this simple mindfulness exercise: Take 5 deep breaths, focusing only on the sensation of breathing."
+      });
     }
   });
 
@@ -302,9 +349,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return res.json({
         tip: result.tip || 'Take a moment to breathe deeply and center yourself.'
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error generating daily tip:", error);
-      res.status(500).json({ error: "Failed to generate daily tip" });
+      
+      if (error.code === 'insufficient_quota') {
+        return res.json({
+          tip: "AI tips are temporarily unavailable due to API quota limits. Please check your OpenAI account billing or try again later."
+        });
+      }
+      
+      return res.json({
+        tip: "Take a moment to breathe deeply and center yourself."
+      });
     }
   });
 
