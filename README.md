@@ -42,7 +42,7 @@ You need these installed on your computer:
 ### Step 2: Get the Code
 ```bash
 # Download the project
-git clone <your-repository-url>
+git clone https://github.com/AishwaryaChandel27/Vihaara--AI-powered-mental-wellness-and-healthcare-app
 cd vihaara
 
 # Install all required packages
