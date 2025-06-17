@@ -219,7 +219,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error("Error generating health advice:", error);
       
       return res.json({
-        advice: getHealthAdviceContent(category)
+        advice: getHealthAdviceContent(req.body.category || 'general')
       });
     }
   });
@@ -285,14 +285,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error: any) {
       console.error("Error generating mental peace technique:", error);
       
-      if (error.code === 'insufficient_quota') {
-        return res.json({
-          technique: "AI-generated techniques are temporarily unavailable due to API quota limits. Please check your OpenAI account billing or try again later. In the meantime, try this simple breathing exercise: Breathe in for 4 counts, hold for 4 counts, breathe out for 4 counts. Repeat 5 times."
-        });
-      }
-      
       return res.json({
-        technique: "AI-generated techniques are temporarily unavailable. Try this simple mindfulness exercise: Take 5 deep breaths, focusing only on the sensation of breathing."
+        technique: getMentalPeaceTechnique(req.body.category || 'mindfulness')
       });
     }
   });
@@ -336,14 +330,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error: any) {
       console.error("Error generating daily tip:", error);
       
-      if (error.code === 'insufficient_quota') {
-        return res.json({
-          tip: "AI tips are temporarily unavailable due to API quota limits. Please check your OpenAI account billing or try again later."
-        });
-      }
-      
       return res.json({
-        tip: "Take a moment to breathe deeply and center yourself."
+        tip: getDailyTip()
       });
     }
   });
