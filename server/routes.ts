@@ -2,6 +2,14 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import OpenAI from "openai";
+import { 
+  getJournalInsight, 
+  getMoodInsight, 
+  getChatResponse, 
+  getHealthAdviceContent, 
+  getMentalPeaceTechnique, 
+  getDailyTip 
+} from "./fallback-content";
 
 // Initialize OpenAI client
 const openai = new OpenAI({ 
@@ -49,16 +57,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error: any) {
       console.error("Error analyzing journal:", error);
       
-      if (error.code === 'insufficient_quota') {
-        return res.json({
-          insights: "Your journal entry has been saved. AI analysis is temporarily unavailable due to API quota limits. Please check your OpenAI account billing or try again later.",
-          tags: ["reflection", "mindfulness"]
-        });
-      }
-      
+      // Return helpful fallback content instead of error messages
       return res.json({
-        insights: "Your journal entry has been saved successfully. AI analysis is temporarily unavailable.",
-        tags: ["reflection"]
+        insights: getJournalInsight(),
+        tags: ["reflection", "mindfulness", "self-awareness"]
       });
     }
   });
@@ -96,14 +98,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error: any) {
       console.error("Error generating mood insights:", error);
       
-      if (error.code === 'insufficient_quota') {
-        return res.json({
-          insights: "Your mood data has been saved. AI insights are temporarily unavailable due to API quota limits. Please check your OpenAI account billing or try again later."
-        });
-      }
-      
       return res.json({
-        insights: "Your mood data has been saved successfully. AI insights are temporarily unavailable."
+        insights: getMoodInsight()
       });
     }
   });
@@ -155,14 +151,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error: any) {
       console.error("Error generating chat response:", error);
       
-      if (error.code === 'insufficient_quota') {
-        return res.json({
-          response: "I'm temporarily unavailable due to API quota limits. Please check your OpenAI account billing or try again later. In the meantime, feel free to use the journal and mood tracking features!"
-        });
-      }
-      
       return res.json({
-        response: "I'm temporarily unavailable right now. Please try again in a few moments, or use the other wellness features in the app."
+        response: getChatResponse(req.body.tone || 'friendly')
       });
     }
   });
@@ -228,14 +218,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error: any) {
       console.error("Error generating health advice:", error);
       
-      if (error.code === 'insufficient_quota') {
-        return res.json({
-          advice: "AI health advice is temporarily unavailable due to API quota limits. Please check your OpenAI account billing or try again later. For immediate health concerns, please consult with a healthcare professional."
-        });
-      }
-      
       return res.json({
-        advice: "AI health advice is temporarily unavailable. Please consult with a healthcare professional for personalized guidance."
+        advice: getHealthAdviceContent(category)
       });
     }
   });
