@@ -1,221 +1,106 @@
-# Vihaara - Mindful Digital Sanctuary
+# Vihaara — Journal, Mood and Wellness Companion
 
-A privacy-focused mental wellness application that serves as your personal sanctuary for mental clarity and emotional well-being. Vihaara provides AI-powered journaling insights, mood tracking, an intelligent chat companion, and wellness resources while keeping all your data completely private and stored locally on your device.
+A React and Express wellness prototype for recording journal entries, tracking moods and requesting AI-assisted reflections. It combines browser-local records with server-side AI requests.
 
-## What Makes Vihaara Special
+## What it implements
 
-**Privacy First**: Your personal data never leaves your device. All journals, mood entries, and conversations stay completely private.
+- Write journal entries and request reflections.
+- Record moods and review insights.
+- Chat with configurable tone and response length.
+- Browse health-advice and mental-peace content, with bundled fallback responses.
 
-**Intelligent AI Support**: Dual AI system with OpenAI GPT-4o and Google Gemini ensures you always get thoughtful, personalized responses.
+## How it works
 
-**Comprehensive Wellness Tools**: Everything you need for mental wellness in one beautiful, easy-to-use application.
+React pages use the local-storage helpers in `client/src/lib/storage.ts`. AI requests reach six Express handlers in `server/routes.ts`, which try OpenAI `gpt-4o`, then Gemini `gemini-1.5-flash`, then static fallback content. The user-storage adapter is in memory; the PostgreSQL schema does not make journals persist on a server.
 
-## Features
+## Current limitations
 
-### Mental Wellness Tools
-- **Smart Journaling** - Write your thoughts and get AI-powered emotional insights and analysis
-- **Mood Tracking** - Log daily moods with pattern recognition and helpful visualizations  
-- **AI Chat Companion** - Have meaningful conversations with an AI trained in mental wellness
-- **Health Guidance** - Get personalized advice on sleep, nutrition, exercise, and more
-- **Mindfulness Techniques** - Learn breathing exercises, meditation, and stress relief practices
-- **Daily Wellness Tips** - Receive personalized insights to improve your mental health
+Content used in AI requests leaves the device and may be processed by external providers. Browser-local storage is not encryption. The OpenAI client is constructed before fallback checks, so a missing OpenAI key can prevent startup despite the intended key-free fallback. This is a wellness prototype, with no demonstrated clinical evaluation, access control or automated test suite.
 
-### Privacy & Control
-- All your data stays on your device - never uploaded to servers
-- Export your data anytime you want
-- Delete everything with one click
-- No tracking, no ads, no data collection
+## Run locally
 
-### Advanced AI Features
-- Dual AI system for maximum reliability (OpenAI + Google Gemini)
-- Automatic backup when one AI service has issues
-- Choose your preferred AI tone: friendly, clinical, or spiritual
-- Adjustable response length for your preferences
+The commands below were checked against source paths and manifests; application startup was not tested unless explicitly stated.
+Use Node.js 20.11 or newer (the Vite configuration uses `import.meta.dirname`), npm, and a POSIX shell or WSL. Set the environment variables below in the launching process; these scripts do not explicitly load a `.env` file.
 
-## Quick Start Guide
-
-### Step 1: Prerequisites
-You need these installed on your computer:
-- **Node.js 20 or newer** - Download from [nodejs.org](https://nodejs.org)
-- **npm** - Comes with Node.js automatically
-
-### Step 2: Get the Code
 ```bash
-# Download the project
-git clone https://github.com/AishwaryaChandel27/Vihaara--AI-powered-mental-wellness-and-healthcare-app
-cd vihaara
-
-# Install all required packages
+git clone --branch main https://github.com/AishwaryaChandel27/Vihaara--AI-powered-mental-wellness-and-healthcare-app.git
+cd Vihaara--AI-powered-mental-wellness-and-healthcare-app
 npm install
-```
-
-### Step 3: Get Your AI Keys (Required for AI features)
-
-#### Get OpenAI API Key
-1. Go to [platform.openai.com](https://platform.openai.com)
-2. Sign up or log in to your account
-3. Click "API" in the sidebar
-4. Click "Create new secret key"
-5. Copy the key that starts with "sk-"
-
-#### Get Google Gemini API Key  
-1. Go to [aistudio.google.com](https://aistudio.google.com)
-2. Sign up or log in with your Google account
-3. Click "Get API key" button
-4. Click "Create API key"
-5. Copy the key
-
-### Step 4: Configure Your Keys
-Create a file called `.env` in the main project folder and add your keys:
-
-```env
-OPENAI_API_KEY=sk-your-openai-key-here
-GEMINI_API_KEY=your-gemini-key-here
-```
-
-**Important**: Keep these keys private. Never share them or commit them to version control.
-
-### Step 5: Start the Application
-```bash
+# Set provider environment variables before starting.
 npm run dev
 ```
+Open `http://localhost:5000` (or the configured port). Frontend and API are served by the same process.
 
-Open your browser and go to: `http://localhost:5000`
-
-That's it! You now have your personal wellness sanctuary running.
-
-## How to Use Vihaara
-
-### Using the Journal
-1. Click "Journal" in the sidebar
-2. Write about your day, thoughts, or feelings
-3. Click "Analyze Entry" to get AI insights about your emotional state
-4. View all your entries and insights over time
-
-### Tracking Your Mood
-1. Go to "Mood Tracking" 
-2. Select how you're feeling today
-3. Add context about what influenced your mood
-4. View patterns and get AI insights about your mood trends
-
-### Chatting with AI
-1. Open the "Chat" section
-2. Talk to your AI companion about anything on your mind
-3. Adjust the tone (friendly/clinical/spiritual) in Settings
-4. Change response length if you prefer brief or detailed answers
-
-### Getting Wellness Advice
-1. Visit "Health Advice" for tips on sleep, nutrition, exercise
-2. Check "Mental Peace" for mindfulness and stress relief techniques
-3. See your daily wellness tip on the home page
-
-### Managing Your Data
-1. Go to Settings to export all your data
-2. Clear your data anytime if needed
-3. All data stays on your device - nothing is uploaded to servers
-
-## Troubleshooting
-
-### App Won't Start
-- Make sure Node.js 20+ is installed: `node --version`
-- Try deleting `node_modules` and running `npm install` again
-- Check that you're in the correct directory
-
-### AI Features Not Working
-- Verify your API keys are correctly set in the `.env` file
-- Check that your OpenAI account has available credits
-- Make sure your Gemini API key is active
-- The app will show helpful messages if there are API issues
-
-### Browser Issues
-- Try refreshing the page
-- Clear browser cache and localStorage
-- Use a modern browser (Chrome, Firefox, Safari, Edge)
-
-### Data Not Saving
-- Check that your browser allows localStorage
-- Disable private/incognito mode
-- Make sure you have enough storage space
-
-## Technical Details
-
-### How the AI System Works
-- Tries OpenAI GPT-4o first for the highest quality responses
-- Automatically switches to Google Gemini if OpenAI has quota issues
-- Falls back to helpful pre-written content if both AI services are unavailable
-- Your conversations are processed but never stored on our servers
-
-### Data Storage
-- Everything stored in your browser's localStorage
-- No databases, no cloud storage, no tracking
-- Data export creates a JSON file you can save anywhere
-- Clearing data removes everything permanently from your device
-
-## Advanced Configuration
-
-### Customizing AI Responses
-In the Settings page, you can adjust:
-- **AI Tone**: Choose friendly, clinical, or spiritual response styles
-- **Response Length**: Brief, balanced, or detailed answers
-- **Theme**: Switch between light and dark modes
-
-### Development Setup
-If you want to modify or contribute to Vihaara:
+Declared checks and build commands:
 
 ```bash
-# Development mode with hot reloading
-npm run dev
-
-# Build for production
+npm run check
 npm run build
+npm start
+```
+`check` is TypeScript checking, not an automated behavior test. `db:push` exists but is not needed for the active in-memory adapter; it requires a separately configured database. Production build commands do not establish that the application is ready for public deployment.
 
-# View project structure
-├── client/          # React frontend
-├── server/          # Express backend  
-├── shared/          # Shared types
-└── README.md        # This file
+## Configuration
+
+| Variable | Purpose / requirement |
+| --- | --- |
+| `OPENAI_API_KEY` | Required for the current client initialization and OpenAI calls |
+| `GEMINI_API_KEY` | Optional secondary AI provider |
+
+Use your own credentials. Never commit populated secret values.
+
+## Usage
+
+Open the journal, add a non-sensitive sample entry, and request an insight. Record a mood and try a chat message. Review Settings before clearing browser data, which removes locally stored records.
+
+### Example request
+
+```bash
+curl -X POST http://localhost:5000/api/ai/analyze-journal \
+  -H "Content-Type: application/json" \
+  -d '{"content":"I enjoyed a quiet walk today."}'
 ```
 
-### API Endpoints
-The app uses these internal endpoints:
-- `/api/ai/chat` - AI conversations
-- `/api/ai/analyze-journal` - Journal analysis
-- `/api/ai/mood-insights` - Mood pattern analysis
-- `/api/ai/health-advice` - Wellness guidance
-- `/api/ai/mental-peace` - Mindfulness techniques
-- `/api/ai/daily-tip` - Daily wellness tips
+Missing journal content returns HTTP 400. No API authentication middleware is present in the reviewed handlers. Provider requests may incur usage charges.
+
+## API route index
+
+Routes below are declared in [server/routes.ts](server/routes.ts). `:id` and similar segments are path parameters. Fields shown are read directly from request JSON; schema-validated routes also depend on [shared/schema.ts](shared/schema.ts). This is a source-level index, not a record of successful API calls.
+
+| Method | Path | Body fields / contract source |
+| --- | --- | --- |
+| POST | `/api/ai/analyze-journal` | `content` |
+| POST | `/api/ai/mood-insights` | `entries` |
+| POST | `/api/ai/chat` | `messages`, `tone`, `responseLength` |
+| POST | `/api/ai/health-advice` | `category`, `tone` |
+| POST | `/api/ai/mental-peace` | `category`, `tone` |
+| POST | `/api/ai/daily-tip` | `tone` |
+
+The reviewed handlers do not establish an authenticated user boundary. Validate inputs and access control before exposing these routes beyond a local demonstration.
+
+## Source map
+
+| Path | Responsibility |
+| --- | --- |
+| [client/src/lib/storage.ts](client/src/lib/storage.ts) | Browser persistence |
+| [client/src/lib/openai.ts](client/src/lib/openai.ts) | Client API requests |
+| [server/routes.ts](server/routes.ts) | AI orchestration and validation |
+| [server/fallback-content.ts](server/fallback-content.ts) | Static responses |
+
+## Validation
+
+Documentation was checked against the repository snapshot on 28 October 2026. No application test suite was run for this repository. Provider availability, browser behavior, builds and deployment are unverified.
+
+## Demo capture
+
+Suggested addition: a short recording of the usage workflow above, with synthetic inputs and visible limitations. No new screenshot or recording was produced in this audit.
 
 ## Contributing
 
-Want to help improve Vihaara? Here's how:
-
-1. Fork the project on GitHub
-2. Create a feature branch: `git checkout -b amazing-feature`
-3. Make your changes and test them
-4. Commit: `git commit -m 'Add amazing feature'`
-5. Push: `git push origin amazing-feature`
-6. Open a Pull Request
-
-## Privacy & Security
-
-Your privacy is our top priority:
-- No user data is ever sent to our servers
-- All personal information stays on your device
-- AI processing is temporary and not stored
-- No tracking, analytics, or data collection
-- Open source code for complete transparency
-
-## Support
-
-Need help? Here are your options:
-- Check the troubleshooting section above
-- Open an issue on GitHub for bugs or feature requests
-- Review the code - it's open source and well-documented
+Open an issue with reproduction steps or submit a focused pull request. Keep prototype behavior and future plans clearly distinguished, and include verification steps for changes.
 
 ## License
 
-This project is open source under the MIT License. You're free to use, modify, and distribute it.
+No license file was found. A manifest or older README license label does not replace an explicit license grant.
 
----
-
-**Vihaara** - Your personal, private sanctuary for mental wellness and emotional well-being.
+Maintained in [AishwaryaChandel27’s repositories](https://github.com/AishwaryaChandel27).
