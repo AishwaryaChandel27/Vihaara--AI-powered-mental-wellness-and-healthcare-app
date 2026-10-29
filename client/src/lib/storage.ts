@@ -1,70 +1,99 @@
-import { 
-  Activity, 
-  JournalEntry, 
-  MoodEntry, 
-  ChatMessage, 
-  JournalAnalysis
-} from '@/types';
-import { getAiJournalAnalysis, getDailyWellnessTip, getMoodInsightAnalysis, getAiChatResponse } from './openai';
+import { readRecords, isObject } from "./device-storage";
+import {
+  Activity,
+  JournalEntry,
+  MoodEntry,
+  ChatMessage,
+  JournalAnalysis,
+} from "@/types";
+import {
+  getAiJournalAnalysis,
+  getDailyWellnessTip,
+  getMoodInsightAnalysis,
+  getAiChatResponse,
+} from "./openai";
 
 // Local storage keys
 const STORAGE_KEYS = {
-  JOURNAL_ENTRIES: 'mindmate-journal-entries',
-  MOOD_ENTRIES: 'mindmate-mood-entries',
-  CHAT_HISTORY: 'mindmate-chat-history',
-  RECENT_ACTIVITIES: 'mindmate-recent-activities',
-  DAILY_TIP: 'mindmate-daily-tip',
-  DAILY_TIP_DATE: 'mindmate-daily-tip-date'
+  JOURNAL_ENTRIES: "mindmate-journal-entries",
+  MOOD_ENTRIES: "mindmate-mood-entries",
+  CHAT_HISTORY: "mindmate-chat-history",
+  RECENT_ACTIVITIES: "mindmate-recent-activities",
+  DAILY_TIP: "mindmate-daily-tip",
+  DAILY_TIP_DATE: "mindmate-daily-tip-date",
 };
 
 // Journal Functions
 export function getJournalEntries(): JournalEntry[] {
-  const entries = localStorage.getItem(STORAGE_KEYS.JOURNAL_ENTRIES);
-  return entries ? JSON.parse(entries) : [];
+  return readRecords<JournalEntry>(
+    STORAGE_KEYS.JOURNAL_ENTRIES,
+    (v): v is JournalEntry =>
+      isObject(v) &&
+      typeof v.id === "string" &&
+      typeof v.title === "string" &&
+      typeof v.content === "string" &&
+      typeof v.date === "string" &&
+      Number.isFinite(Date.parse(v.date)) &&
+      Array.isArray(v.tags) &&
+      v.tags.every((t) => typeof t === "string") &&
+      (v.analysis === null || typeof v.analysis === "string"),
+  );
 }
 
 export function saveJournalEntry(entry: JournalEntry): void {
   const entries = getJournalEntries();
   entries.unshift(entry); // Add to beginning
   localStorage.setItem(STORAGE_KEYS.JOURNAL_ENTRIES, JSON.stringify(entries));
-  
+
   // Add to recent activities
   addActivity({
     id: entry.id,
-    type: 'journal',
-    title: 'Journal Entry',
+    type: "journal",
+    title: "Journal Entry",
     timestamp: new Date().toLocaleString(),
-    icon: 'book'
+    icon: "book",
   });
 }
 
-export async function analyzeJournalEntry(content: string): Promise<JournalAnalysis> {
+export async function analyzeJournalEntry(
+  content: string,
+): Promise<JournalAnalysis> {
   try {
     return await getAiJournalAnalysis(content);
   } catch (error) {
-    console.error('Error analyzing journal entry:', error);
+    console.error("Error analyzing journal entry:", error);
     return {
       insights: "Unable to analyze journal entry at this time.",
-      tags: ['unanalyzed']
+      tags: ["unanalyzed"],
     };
   }
 }
 
 // Mood Functions
 export function getMoodEntries(): MoodEntry[] {
-  const entries = localStorage.getItem(STORAGE_KEYS.MOOD_ENTRIES);
-  return entries ? JSON.parse(entries) : [];
+  return readRecords<MoodEntry>(
+    STORAGE_KEYS.MOOD_ENTRIES,
+    (v): v is MoodEntry =>
+      isObject(v) &&
+      typeof v.id === "string" &&
+      typeof v.date === "string" &&
+      Number.isFinite(Date.parse(v.date)) &&
+      ["amazing", "happy", "neutral", "sad", "terrible"].includes(
+        String(v.mood),
+      ) &&
+      (v.context === null || typeof v.context === "string"),
+  );
 }
 
 export function saveMoodEntry(entry: MoodEntry): void {
   const entries = getMoodEntries();
-  
+
   // Check if already logged mood today
   const today = new Date().toDateString();
-  const todayEntryIndex = entries.findIndex(e => 
-    new Date(e.date).toDateString() === today
+  const todayEntryIndex = entries.findIndex(
+    (e) => new Date(e.date).toDateString() === today,
   );
-  
+
   if (todayEntryIndex !== -1) {
     // Update today's entry
     entries[todayEntryIndex] = entry;
@@ -72,16 +101,16 @@ export function saveMoodEntry(entry: MoodEntry): void {
     // Add new entry
     entries.unshift(entry);
   }
-  
+
   localStorage.setItem(STORAGE_KEYS.MOOD_ENTRIES, JSON.stringify(entries));
-  
+
   // Add to recent activities
   addActivity({
     id: entry.id,
-    type: 'mood',
+    type: "mood",
     title: `Mood Tracked: ${entry.mood.charAt(0).toUpperCase() + entry.mood.slice(1)}`,
     timestamp: new Date().toLocaleString(),
-    icon: 'smile'
+    icon: "smile",
   });
 }
 
@@ -89,42 +118,52 @@ export async function getMoodInsights(entries: MoodEntry[]): Promise<string> {
   try {
     return await getMoodInsightAnalysis(entries);
   } catch (error) {
-    console.error('Error getting mood insights:', error);
+    console.error("Error getting mood insights:", error);
     return "Track your mood regularly to get personalized insights.";
   }
 }
 
 // Chat Functions
 export function getChatHistory(): ChatMessage[] {
-  const history = localStorage.getItem(STORAGE_KEYS.CHAT_HISTORY);
-  return history ? JSON.parse(history) : [];
+  return readRecords<ChatMessage>(
+    STORAGE_KEYS.CHAT_HISTORY,
+    (v): v is ChatMessage =>
+      isObject(v) &&
+      typeof v.id === "string" &&
+      ["user", "assistant"].includes(String(v.role)) &&
+      typeof v.content === "string" &&
+      typeof v.timestamp === "string",
+  );
 }
 
 export function saveChatHistory(messages: ChatMessage[]): void {
   localStorage.setItem(STORAGE_KEYS.CHAT_HISTORY, JSON.stringify(messages));
-  
+
   // Only add to activities when a new message is added
-  if (messages.length > 0 && messages[messages.length - 1].role === 'assistant') {
+  if (
+    messages.length > 0 &&
+    messages[messages.length - 1].role === "assistant"
+  ) {
     addActivity({
       id: Date.now().toString(),
-      type: 'chat',
-      title: 'AI Chat Session',
+      type: "chat",
+      title: "AI Chat Session",
       timestamp: new Date().toLocaleString(),
-      icon: 'comment-dots'
+      icon: "comment-dots",
     });
   }
 }
 
 export async function getChatResponse(
-  messages: ChatMessage[], 
+  messages: ChatMessage[],
   tone: string,
-  responseLength: number
+  responseLength: number,
 ): Promise<string> {
   try {
     return await getAiChatResponse(messages, tone, responseLength);
   } catch (error) {
-    console.error('Error getting chat response:', error);
-    throw new Error('Failed to get response from AI assistant');
+    console.error("Error getting chat response:", error);
+    throw new Error("Failed to get response from AI assistant");
   }
 }
 
@@ -132,47 +171,65 @@ export async function getChatResponse(
 export function getDailyTip(): string {
   const lastDate = localStorage.getItem(STORAGE_KEYS.DAILY_TIP_DATE);
   const today = new Date().toDateString();
-  
+
   // Check if tip was generated today
   if (lastDate === today) {
     const tip = localStorage.getItem(STORAGE_KEYS.DAILY_TIP);
     if (tip) return tip;
   }
-  
+
   // Default tip if none exists or is outdated
-  return "Taking a few minutes for mindful breathing can reset your nervous system and improve your focus throughout the day.";
+  return "Take a comfortable pause and notice what you need in this moment.";
 }
 
 export async function generateNewTip(tone: string): Promise<string> {
   try {
     const tip = await getDailyWellnessTip(tone);
     localStorage.setItem(STORAGE_KEYS.DAILY_TIP, tip);
-    localStorage.setItem(STORAGE_KEYS.DAILY_TIP_DATE, new Date().toDateString());
+    localStorage.setItem(
+      STORAGE_KEYS.DAILY_TIP_DATE,
+      new Date().toDateString(),
+    );
     return tip;
   } catch (error) {
-    console.error('Error generating daily tip:', error);
+    console.error("Error generating daily tip:", error);
     return "Remember to take care of your mental health as much as your physical health.";
   }
 }
 
 // Activity Functions
 export function getRecentActivities(): Activity[] {
-  const activities = localStorage.getItem(STORAGE_KEYS.RECENT_ACTIVITIES);
-  return activities ? JSON.parse(activities) : [];
+  return readRecords<Activity>(
+    STORAGE_KEYS.RECENT_ACTIVITIES,
+    (v): v is Activity =>
+      isObject(v) &&
+      typeof v.id === "string" &&
+      typeof v.title === "string" &&
+      typeof v.timestamp === "string" &&
+      ["journal", "mood", "chat"].includes(String(v.type)) &&
+      typeof v.icon === "string",
+  );
 }
 
 function addActivity(activity: Activity): void {
-  const activities = getRecentActivities();
-  activities.unshift(activity);
-  
-  // Limit to 10 recent activities
-  const limitedActivities = activities.slice(0, 10);
-  localStorage.setItem(STORAGE_KEYS.RECENT_ACTIVITIES, JSON.stringify(limitedActivities));
+  try {
+    const activities = getRecentActivities();
+    activities.unshift(activity);
+
+    // Limit to 10 recent activities
+    const limitedActivities = activities.slice(0, 10);
+    localStorage.setItem(
+      STORAGE_KEYS.RECENT_ACTIVITIES,
+      JSON.stringify(limitedActivities),
+    );
+  } catch {
+    /* Optional activity history must not invalidate a saved journal or mood. */
+  }
 }
 
 // Data Management Functions
 export function clearAllData(): void {
-  Object.values(STORAGE_KEYS).forEach(key => {
+  Object.values(STORAGE_KEYS).forEach((key) => {
     localStorage.removeItem(key);
   });
 }
@@ -183,22 +240,22 @@ export function exportData(): boolean {
       journalEntries: getJournalEntries(),
       moodEntries: getMoodEntries(),
       chatHistory: getChatHistory(),
-      exportDate: new Date().toISOString()
+      exportDate: new Date().toISOString(),
     };
-    
+
     const dataStr = JSON.stringify(data, null, 2);
     const dataUri = `data:application/json;charset=utf-8,${encodeURIComponent(dataStr)}`;
-    
-    const exportName = `mindmate-data-${new Date().toISOString().slice(0, 10)}.json`;
-    
-    const linkElement = document.createElement('a');
-    linkElement.setAttribute('href', dataUri);
-    linkElement.setAttribute('download', exportName);
+
+    const exportName = `vihaara-data-${new Date().toISOString().slice(0, 10)}.json`;
+
+    const linkElement = document.createElement("a");
+    linkElement.setAttribute("href", dataUri);
+    linkElement.setAttribute("download", exportName);
     linkElement.click();
-    
+
     return true;
   } catch (error) {
-    console.error('Error exporting data:', error);
+    console.error("Error exporting data:", error);
     return false;
   }
 }

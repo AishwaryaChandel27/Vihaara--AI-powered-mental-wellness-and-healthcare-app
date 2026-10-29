@@ -1,106 +1,101 @@
-# Vihaara — Journal, Mood and Wellness Companion
+<div align="center">
 
-A React and Express wellness prototype for recording journal entries, tracking moods and requesting AI-assisted reflections. It combines browser-local records with server-side AI requests.
+<img src="client/public/favicon.svg" width="72" alt="Vihaara lotus" />
 
-## What it implements
+# Vihaara
+### A little space to just be.
 
-- Write journal entries and request reflections.
-- Record moods and review insights.
-- Chat with configurable tone and response length.
-- Browse health-advice and mental-peace content, with bundled fallback responses.
+A local-first mental wellness companion for reflection, mood awareness, and everyday calm.
 
-## How it works
+**No account · No API key · No paid AI endpoint**
 
-React pages use the local-storage helpers in `client/src/lib/storage.ts`. AI requests reach six Express handlers in `server/routes.ts`, which try OpenAI `gpt-4o`, then Gemini `gemini-1.5-flash`, then static fallback content. The user-storage adapter is in memory; the PostgreSQL schema does not make journals persist on a server.
+</div>
 
-## Current limitations
+![Vihaara sanctuary interface](docs/sanctuary-preview.jpg)
 
-Content used in AI requests leaves the device and may be processed by external providers. Browser-local storage is not encryption. The OpenAI client is constructed before fallback checks, so a missing OpenAI key can prevent startup despite the intended key-free fallback. This is a wellness prototype, with no demonstrated clinical evaluation, access control or automated test suite.
+## A sanctuary, not another task list
+
+Vihaara keeps its original purpose: a welcoming place to journal, check in with your feelings, talk through a thought, and explore wellbeing practices. Its botanical interface combines warm paper tones, an illustrated garden, gentle interactions, and an evening theme—without streaks or pressure to perform.
+
+### What you can do
+
+- **Check in with your inner weather:** save or update today's mood from the sanctuary, add context in Mood Garden, and see your actual recent check-ins.
+- **Leave it on the page:** use journal prompts, save entries, expand the full text, and read local reflections.
+- **Talk it through:** use the prepared offline guide immediately or explicitly load an on-device language model for generative chat and journal reflections.
+- **Enter the quiet room:** try 1-, 3-, or 5-minute breathing sessions, a skippable five-senses grounding trail, and adjustable rain, shoreline, or low-breeze sounds generated with Web Audio.
+- **Keep control of your records:** export or clear wellness data, remove downloaded model files, and recover raw records if a saved record is unreadable.
+- **Take it offline:** the production service worker caches the app shell, fonts, icons, and code after a successful first load. Model files have their own optional cache.
+
+## Honest AI modes
+
+| Mode | How it works | Requirements |
+| --- | --- | --- |
+| Offline guide | Prepared prompts with local keyword matching; explicitly labelled as a guide, not generative AI | No download beyond the app |
+| On-device AI | `SmolLM2-360M-Instruct-q4f32_1-MLC` through WebLLM in a Web Worker | HTTPS or localhost, WebGPU, several hundred MB of initial downloads and sufficient device memory |
+| Mood summaries | Deterministic counts from the latest seven recorded check-ins | Your own saved records |
+| Wellbeing library | Bundled general self-care material | No AI model needed |
+
+Enable the model from Chat, Journal, or Settings. Loading has progress and cancellation controls. Unsupported browsers, load errors, or generation failure retain the offline guide. Generation has a timeout. The model is intentionally small and can produce weak, incorrect, or inappropriate responses; it has not been clinically evaluated. Some risk-related language bypasses generation for prepared support guidance, but this is **not reliable crisis detection**.
+
+The first model download contacts Hugging Face and the WebLLM model library host. Personal journal/chat content is not sent to those hosts. After cached files are available, inference runs locally; browser cache eviction can require another download. No inference fees are charged by this code; device resources, connectivity and hosting are separate considerations.
 
 ## Run locally
 
-The commands below were checked against source paths and manifests; application startup was not tested unless explicitly stated.
-Use Node.js 20.11 or newer (the Vite configuration uses `import.meta.dirname`), npm, and a POSIX shell or WSL. Set the environment variables below in the launching process; these scripts do not explicitly load a `.env` file.
+Requires Node.js 20.11+ and npm. No `.env`, database, account, or provider credentials are needed.
 
 ```bash
-git clone --branch main https://github.com/AishwaryaChandel27/Vihaara--AI-powered-mental-wellness-and-healthcare-app.git
-cd Vihaara--AI-powered-mental-wellness-and-healthcare-app
-npm install
-# Set provider environment variables before starting.
+npm ci
 npm run dev
 ```
-Open `http://localhost:5000` (or the configured port). Frontend and API are served by the same process.
 
-Declared checks and build commands:
-
-```bash
-npm run check
-npm run build
-npm start
-```
-`check` is TypeScript checking, not an automated behavior test. `db:push` exists but is not needed for the active in-memory adapter; it requires a separately configured database. Production build commands do not establish that the application is ready for public deployment.
-
-## Configuration
-
-| Variable | Purpose / requirement |
-| --- | --- |
-| `OPENAI_API_KEY` | Required for the current client initialization and OpenAI calls |
-| `GEMINI_API_KEY` | Optional secondary AI provider |
-
-Use your own credentials. Never commit populated secret values.
-
-## Usage
-
-Open the journal, add a non-sensitive sample entry, and request an insight. Record a mood and try a chat message. Review Settings before clearing browser data, which removes locally stored records.
-
-### Example request
+Open `http://localhost:5000`. You can set `PORT` or pass `--port` to the development command. Scripts work across Windows and POSIX shells.
 
 ```bash
-curl -X POST http://localhost:5000/api/ai/analyze-journal \
-  -H "Content-Type: application/json" \
-  -d '{"content":"I enjoyed a quiet walk today."}'
+npm run check       # TypeScript
+npm run build       # production frontend, offline shell, and optional Express server
+npm test            # local logic, data recovery, server and offline-cache tests
+npm start           # production Express hosting
 ```
 
-Missing journal content returns HTTP 400. No API authentication middleware is present in the reviewed handlers. Provider requests may incur usage charges.
+For a frontend-only deployment:
 
-## API route index
+```bash
+npm run build:static
+```
 
-Routes below are declared in [server/routes.ts](server/routes.ts). `:id` and similar segments are path parameters. Fields shown are read directly from request JSON; schema-validated routes also depend on [shared/schema.ts](shared/schema.ts). This is a source-level index, not a record of successful API calls.
+Publish **`dist/public`** with SPA fallback to `index.html` and HTTPS. `vercel.json` configures this for Vercel; `render.yaml` describes a Render static site. Existing Render Node services can continue using `npm run build` / `npm start`, without AI keys. The repository configuration does not automatically migrate an existing hosting service to a static site.
 
-| Method | Path | Body fields / contract source |
-| --- | --- | --- |
-| POST | `/api/ai/analyze-journal` | `content` |
-| POST | `/api/ai/mood-insights` | `entries` |
-| POST | `/api/ai/chat` | `messages`, `tone`, `responseLength` |
-| POST | `/api/ai/health-advice` | `category`, `tone` |
-| POST | `/api/ai/mental-peace` | `category`, `tone` |
-| POST | `/api/ai/daily-tip` | `tone` |
+## Privacy and care
 
-The reviewed handlers do not establish an authenticated user boundary. Validate inputs and access control before exposing these routes beyond a local demonstration.
+- Existing `mindmate-*` storage keys are preserved, so previous entries remain available on the **same browser and origin**.
+- Records are stored in **unencrypted localStorage**. A person with access to the browser profile may read them. There is no login, encrypted vault, or cross-device sync.
+- Exports are unencrypted JSON; keep them private. Changing domain or clearing browser data affects access to existing entries.
+- The app ships its own fonts and icons. It does not load analytics, remote audio, or font CDNs.
+- The optional server only serves files and `/api/health`. Old `/api/ai/*` endpoints return HTTP 410; no cloud AI calls remain in the runtime.
+- Hosting and model-download providers still see normal connection metadata. The app does not claim total network anonymity.
+- Vihaara is a wellbeing prototype, **not a therapist, medical device, diagnosis tool, or emergency service**. In immediate danger, contact local emergency services or a trusted person who can help you get urgent care.
 
-## Source map
+## Architecture
 
-| Path | Responsibility |
-| --- | --- |
-| [client/src/lib/storage.ts](client/src/lib/storage.ts) | Browser persistence |
-| [client/src/lib/openai.ts](client/src/lib/openai.ts) | Client API requests |
-| [server/routes.ts](server/routes.ts) | AI orchestration and validation |
-| [server/fallback-content.ts](server/fallback-content.ts) | Static responses |
+```text
+client/src/pages/                 Original app destinations, redesigned
+client/src/components/QuietRoom  Breathing, grounding, local ambient audio
+client/src/lib/wellness.ts        Prepared resources and deterministic summaries
+client/src/lib/local-ai.ts        Model lifecycle, progress, cancellation, inference
+client/src/workers/ai.worker.ts   WebLLM inference worker
+client/src/lib/storage.ts         Compatible browser persistence and export
+scripts/offline-build.mjs         Versioned production app-shell cache
+server/routes.ts                 Health check and retired-cloud-route responses
+```
 
-## Validation
+## Verification
 
-Documentation was checked against the repository snapshot on 28 October 2026. No application test suite was run for this repository. Provider availability, browser behavior, builds and deployment are unverified.
+See [docs/VALIDATION.md](docs/VALIDATION.md) for the executed checks and explicit verification limits. A build passing does not establish clinical suitability. Generative output should be reviewed on real WebGPU-capable devices before a broad release.
 
-## Demo capture
+## Sources and dependencies
 
-Suggested addition: a short recording of the usage workflow above, with synthetic inputs and visible limitations. No new screenshot or recording was produced in this audit.
+General relaxation copy was informed by [NHS breathing guidance](https://www.nhs.uk/mental-health/self-help/guides-tools-and-activities/breathing-exercises-for-stress/) and [NHS stress guidance](https://www.nhs.uk/every-mind-matters/mental-health-issues/stress/). Exercises use comfortable pacing and offer stopping or skipping.
 
-## Contributing
+Local inference uses [WebLLM](https://webllm.mlc.ai/docs/) and [SmolLM2](https://huggingface.co/HuggingFaceTB/SmolLM2-360M-Instruct). Dependency and model licences apply to their respective components. The repository currently has no standalone licence file; the package manifest's licence label is not a substitute for one.
 
-Open an issue with reproduction steps or submit a focused pull request. Keep prototype behavior and future plans clearly distinguished, and include verification steps for changes.
-
-## License
-
-No license file was found. A manifest or older README license label does not replace an explicit license grant.
-
-Maintained in [AishwaryaChandel27’s repositories](https://github.com/AishwaryaChandel27).
+Built with React, TypeScript, Vite, Tailwind, Radix UI, Lucide, Web Audio, and WebLLM.

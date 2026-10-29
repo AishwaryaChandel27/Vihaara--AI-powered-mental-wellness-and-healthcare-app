@@ -5,9 +5,9 @@ export default {
   content: ["./client/index.html", "./client/src/**/*.{js,jsx,ts,tsx}"],
   theme: {
     fontFamily: {
-      sans: ['Inter', 'DM Sans', 'sans-serif'],
-      heading: ['Poppins', 'DM Serif Display', 'serif'],
-      journal: ['Merriweather', 'serif']
+      sans: ['DM Sans', 'sans-serif'],
+      heading: ['DM Serif Display', 'serif'],
+      journal: ['Georgia', 'serif']
     },
     extend: {
       borderRadius: {

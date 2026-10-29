@@ -18,6 +18,7 @@ const MoodEmoji: React.FC<MoodEmojiProps> = ({ emoji, label, selected, onClick }
           : "hover:bg-muted text-foreground hover:scale-105"
       )}
       aria-label={label}
+      aria-pressed={selected}
       title={label}
       onClick={onClick}
     >
