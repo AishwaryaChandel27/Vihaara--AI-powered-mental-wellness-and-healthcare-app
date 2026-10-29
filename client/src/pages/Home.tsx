@@ -1,129 +1,224 @@
-import React, { useEffect, useState } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { useSettings } from '@/contexts/SettingsContext';
-import { getRecentActivities, getDailyTip, generateNewTip } from '@/lib/storage';
-import { Activity } from '@/types';
-
-const Home: React.FC = () => {
-  const [dailyTip, setDailyTip] = useState('');
-  const [recentActivities, setRecentActivities] = useState<Activity[]>([]);
-  const { aiTone } = useSettings();
-  
-  // Use for debugging
-  console.log('Home component rendered');
-
-  useEffect(() => {
-    const tip = getDailyTip();
-    setDailyTip(tip);
-    
-    const activities = getRecentActivities();
-    setRecentActivities(activities);
-  }, []);
-
-  const handleRefreshTip = async () => {
-    const newTip = await generateNewTip(aiTone);
-    setDailyTip(newTip);
-  };
-
+import { useState } from "react";
+import { Link } from "wouter";
+import {
+  ArrowRight,
+  BookOpen,
+  Check,
+  Leaf,
+  MessageCircle,
+  RefreshCw,
+  Sparkles,
+} from "lucide-react";
+import GardenArt from "@/components/GardenArt";
+import {
+  getJournalEntries,
+  getMoodEntries,
+  saveMoodEntry,
+} from "@/lib/storage";
+import { tips } from "@/lib/wellness";
+import type { MoodType } from "@/types";
+const moods: { value: MoodType; label: string; face: string; color: string }[] =
+  [
+    { value: "terrible", label: "Heavy", face: "︵", color: "#c5ccd7" },
+    { value: "sad", label: "Low", face: "⌢", color: "#cdc9db" },
+    { value: "neutral", label: "Okay", face: "−", color: "#ddd6b9" },
+    { value: "happy", label: "Good", face: "⌣", color: "#c4d3aa" },
+    { value: "amazing", label: "Lovely", face: "◡", color: "#e9cf94" },
+  ];
+export default function Home() {
+  const [entries, setEntries] = useState(getMoodEntries);
+  const [tip, setTip] = useState(new Date().getDate() % tips.length);
+  const [message, setMessage] = useState("");
+  const journals = getJournalEntries();
+  const today = entries.find(
+    (e) => new Date(e.date).toDateString() === new Date().toDateString(),
+  );
+  const hour = new Date().getHours();
+  function checkIn(value: MoodType) {
+    try {
+      saveMoodEntry({
+        id: `checkin-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+        date: new Date().toISOString(),
+        mood: value,
+        context: today?.context || null,
+      });
+      setEntries(getMoodEntries());
+      setMessage("Your check-in is saved. Every feeling belongs here.");
+    } catch {
+      setMessage(
+        "Your browser could not save this check-in. Try exporting your data and freeing some space.",
+      );
+    }
+  }
   return (
-    <div className="max-w-4xl mx-auto">
-      <div className="text-center mb-8">
-        <h1 className="text-3xl md:text-4xl font-bold font-heading mb-2 bg-gradient-to-r from-primary to-secondary inline-block text-transparent bg-clip-text">Welcome to Vihaara</h1>
-        <p className="text-lg text-muted-foreground">Your sanctuary for mental clarity and emotional well-being</p>
+    <div className="home-page">
+      <div className="welcome-row">
+        <p className="eyebrow">
+          <span className="little-sun">✳</span> GOOD{" "}
+          {hour < 12 ? "MORNING" : hour < 18 ? "AFTERNOON" : "EVENING"}
+        </p>
+        <span className="date-label">
+          {new Date().toLocaleDateString(undefined, {
+            weekday: "long",
+            month: "long",
+            day: "numeric",
+          })}
+        </span>
       </div>
-      
-      {/* Daily Tip Card */}
-      <Card className="mb-8 border border-primary/10 shadow-lg relative overflow-hidden">
-        <div className="absolute -right-12 -top-12 w-40 h-40 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-full blur-2xl pointer-events-none"></div>
-        <CardContent className="p-6 relative z-10">
-          <div className="flex items-center mb-5">
-            <div className="bg-primary/10 p-3 rounded-full shadow-inner">
-              <i className="fas fa-lightbulb text-primary text-xl"></i>
+      <section className="sanctuary-hero">
+        <div className="hero-copy">
+          <span className="eyebrow">TAKE A BREATH. YOU’RE HERE.</span>
+          <h1>
+            A little space
+            <br />
+            to <em>just be.</em>
+          </h1>
+          <p>
+            No perfect routines. No pressure to feel a certain way.
+            <br className="hidden lg:block" /> Just a quiet place to check in,
+            let go, and begin again.
+          </p>
+          <Link href="/mental-peace" className="primary-link">
+            Find a moment of calm <ArrowRight size={17} />
+          </Link>
+          <div className="hero-footnote">
+            <span /> YOUR PACE. YOUR PRIVATE SPACE.
+          </div>
+        </div>
+        <GardenArt />
+      </section>
+      <div className="home-middle">
+        <section className="checkin-card">
+          <div className="section-top">
+            <div>
+              <p className="eyebrow">A MOMENT WITH YOURSELF</p>
+              <h2>What’s your inner weather?</h2>
             </div>
-            <h2 className="ml-4 text-xl font-semibold font-heading">Daily Insight</h2>
+            <span className="tiny-tag">
+              {today ? "Checked in" : "Daily check-in"}
+            </span>
           </div>
-          <p className="text-muted-foreground italic py-2 border-l-2 border-primary/30 pl-4">{dailyTip}</p>
-          <div className="mt-6 text-sm text-muted-foreground flex items-center">
-            <span className="flex items-center"><i className="fas fa-calendar-alt mr-2"></i>Today's Tip</span>
-            <Button variant="outline" size="sm" className="ml-auto hover:bg-primary/10 hover:text-primary transition-colors" onClick={handleRefreshTip}>
-              <i className="fas fa-sync-alt mr-2"></i> Refresh
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-      
-      {/* Quick Access Grid */}
-      <h2 className="text-xl font-semibold font-heading mb-4 flex items-center">
-        <div className="w-2 h-8 bg-gradient-to-b from-primary to-secondary rounded-full mr-2"></div>
-        Quick Access
-      </h2>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-        {/* Journal Card */}
-        <a href="/journal" className="bg-background dark:bg-card border border-primary/10 rounded-xl shadow-sm hover:shadow-md hover:scale-102 transition-all duration-300 p-6 flex flex-col items-center text-center">
-          <div className="bg-purple-100 dark:bg-purple-900/30 p-3 rounded-full mb-3 shadow-inner">
-            <i className="fas fa-book text-purple-500 text-xl"></i>
-          </div>
-          <h3 className="font-medium font-heading mb-1">Journal</h3>
-          <p className="text-sm text-muted-foreground">Reflect and get AI insights</p>
-        </a>
-        
-        {/* AI Chat Card */}
-        <a href="/chat" className="bg-background dark:bg-card border border-primary/10 rounded-xl shadow-sm hover:shadow-md hover:scale-102 transition-all duration-300 p-6 flex flex-col items-center text-center">
-          <div className="bg-blue-100 dark:bg-blue-900/30 p-3 rounded-full mb-3 shadow-inner">
-            <i className="fas fa-comment-dots text-primary text-xl"></i>
-          </div>
-          <h3 className="font-medium font-heading mb-1">AI Chat</h3>
-          <p className="text-sm text-muted-foreground">Talk to your wellness AI</p>
-        </a>
-        
-        {/* Mood Tracker Card */}
-        <a href="/mood" className="bg-background dark:bg-card border border-primary/10 rounded-xl shadow-sm hover:shadow-md hover:scale-102 transition-all duration-300 p-6 flex flex-col items-center text-center">
-          <div className="bg-pink-100 dark:bg-pink-900/30 p-3 rounded-full mb-3 shadow-inner">
-            <i className="fas fa-smile text-pink-500 text-xl"></i>
-          </div>
-          <h3 className="font-medium font-heading mb-1">Mood Tracker</h3>
-          <p className="text-sm text-muted-foreground">Track and analyze your emotions</p>
-        </a>
-      </div>
-      
-      {/* Recent Activity */}
-      <h2 className="text-xl font-semibold font-heading mb-4 flex items-center">
-        <div className="w-2 h-8 bg-gradient-to-b from-secondary to-primary rounded-full mr-2"></div>
-        Recent Activity
-      </h2>
-      <Card className="border border-primary/10 shadow-sm">
-        <CardContent className="p-4">
-          {recentActivities.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
-              <div className="bg-muted/50 p-4 rounded-full mx-auto w-16 h-16 flex items-center justify-center mb-4">
-                <i className="fas fa-history text-2xl text-muted-foreground/70"></i>
-              </div>
-              <p className="font-medium">No recent activities yet</p>
-              <p className="text-sm mt-2">Start using the app to see your activity here!</p>
-            </div>
-          ) : (
-            recentActivities.map((activity, index) => (
-              <div 
-                key={activity.id} 
-                className={`${index !== recentActivities.length - 1 ? 'border-b border-border pb-3 mb-3' : ''} hover:bg-muted/20 rounded-lg transition-colors p-2`}
+          <p className="supporting-copy">
+            All feelings are welcome. Choose what feels closest.
+          </p>
+          <div className="weather-options">
+            {moods.map((m) => (
+              <button
+                key={m.value}
+                aria-label={`Check in: ${m.label}`}
+                aria-pressed={today?.mood === m.value}
+                onClick={() => checkIn(m.value)}
+                className={today?.mood === m.value ? "selected" : ""}
               >
-                <div className="flex items-center">
-                  <div className="bg-muted/70 p-3 rounded-full shadow-inner">
-                    <i className={`fas fa-${activity.icon} text-primary/80 text-lg`}></i>
-                  </div>
-                  <div className="ml-3">
-                    <p className="text-sm font-medium">{activity.title}</p>
-                    <p className="text-xs text-muted-foreground">{activity.timestamp}</p>
-                  </div>
-                </div>
-              </div>
-            ))
-          )}
-        </CardContent>
-      </Card>
+                <span
+                  className="weather-face"
+                  style={{ backgroundColor: m.color }}
+                >
+                  <span className="face-eyes">• •</span>
+                  <span className="face-mouth">{m.face}</span>
+                </span>
+                <span>{m.label}</span>
+                {today?.mood === m.value && <Check size={12} />}
+              </button>
+            ))}
+          </div>
+          <p role="status" className="checkin-status">
+            {message ||
+              (today
+                ? "You can update your check-in as your day changes."
+                : "A small check-in is enough. No explanation needed.")}
+          </p>
+        </section>
+        <section className="daily-note">
+          <div className="section-top">
+            <span className="eyebrow">A GENTLE REMINDER</span>
+            <Sparkles size={17} />
+          </div>
+          <div className="quote-mark">“</div>
+          <p>{tips[tip]}</p>
+          <button onClick={() => setTip((tip + 1) % tips.length)}>
+            <RefreshCw size={13} /> Another little reminder
+          </button>
+          <div className="note-leaf" aria-hidden="true">
+            ✳
+          </div>
+        </section>
+      </div>
+      <section className="pathways">
+        <div className="section-top">
+          <div>
+            <p className="eyebrow">A SMALL STEP IS A START</p>
+            <h2>What would feel good right now?</h2>
+          </div>
+          <span className="supporting-copy hidden lg:block">
+            There’s no right way to begin.
+          </span>
+        </div>
+        <div className="pathway-grid">
+          <Link href="/journal" className="pathway-card journal-path">
+            <span className="pathway-icon">
+              <BookOpen size={23} />
+            </span>
+            <span className="pathway-time">YOUR WORDS, YOUR SPACE</span>
+            <h3>Leave it on the page</h3>
+            <p>
+              Untangle a thought. Capture a little joy. Write without a filter.
+            </p>
+            <span className="pathway-action">
+              Open your journal <ArrowRight size={16} />
+            </span>
+            <span className="pathway-decoration" aria-hidden="true">
+              ∿
+            </span>
+          </Link>
+          <Link href="/chat" className="pathway-card chat-path">
+            <span className="pathway-icon">
+              <MessageCircle size={23} />
+            </span>
+            <span className="pathway-time">A MOMENT TO REFLECT</span>
+            <h3>Talk it through</h3>
+            <p>
+              A gentle guide to help you reflect and find a small next step.
+            </p>
+            <span className="pathway-action">
+              Meet your companion <ArrowRight size={16} />
+            </span>
+            <span className="pathway-decoration" aria-hidden="true">
+              ◌
+            </span>
+          </Link>
+          <Link href="/mental-peace" className="pathway-card peace-path">
+            <span className="pathway-icon">
+              <Leaf size={23} />
+            </span>
+            <span className="pathway-time">ONE UNHURRIED MINUTE</span>
+            <h3>Turn down the noise</h3>
+            <p>Soft soundscapes, a slower breath, and somewhere to land.</p>
+            <span className="pathway-action">
+              Enter the quiet room <ArrowRight size={16} />
+            </span>
+            <span className="pathway-decoration" aria-hidden="true">
+              ☾
+            </span>
+          </Link>
+        </div>
+      </section>
+      <section className="journey-strip">
+        <div>
+          <Leaf size={24} />
+          <div>
+            <h3>Your garden, at your pace</h3>
+            <p>
+              {entries.length || journals.length
+                ? `${entries.length} mood check-ins · ${journals.length} reflections. Every visit is a little care for yourself.`
+                : "Your story starts wherever you are. No streaks to keep, no falling behind."}
+            </p>
+          </div>
+        </div>
+        <Link href="/mood">
+          See your reflections <ArrowRight size={15} />
+        </Link>
+      </section>
     </div>
   );
-};
-
-export default Home;
+}

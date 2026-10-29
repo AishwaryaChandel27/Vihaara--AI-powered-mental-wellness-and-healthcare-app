@@ -1,124 +1,112 @@
-import React from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-
-const About: React.FC = () => {
+import { Leaf, LockKeyhole, Cpu, HeartHandshake } from "lucide-react";
+import { Link } from "wouter";
+export default function About() {
   return (
     <div className="max-w-4xl mx-auto">
-      <div className="flex items-center mb-6 gap-3">
-        <i className="fas fa-om text-primary text-3xl"></i>
-        <h1 className="text-2xl md:text-3xl font-bold font-heading bg-gradient-to-r from-primary to-secondary inline-block text-transparent bg-clip-text">🧘‍♀️ About Vihaara</h1>
+      <p className="eyebrow mb-3">A QUIETER KIND OF TECHNOLOGY</p>
+      <h1 className="mb-6">A little room for being human.</h1>
+      <div className="bg-card border rounded-2xl p-7 mb-5">
+        <p className="text-lg font-heading leading-relaxed">
+          Vihaara is a personal space for reflection, mood check-ins, and
+          everyday wellbeing. It brings a gentle rhythm to your day, with
+          technology that leaves your words on your device.
+        </p>
+        <div className="grid sm:grid-cols-2 gap-7 mt-8">
+          {[
+            {
+              icon: Leaf,
+              title: "Small moments of care",
+              text: "Journaling, breathing, grounding, and ambient sound. No streaks to lose, no pressure to perform.",
+            },
+            {
+              icon: LockKeyhole,
+              title: "Your words stay here",
+              text: "Journals, mood history, and chat are saved in this browser’s localStorage, without encryption. Someone with access to this browser profile may read them. There is no account or cloud sync.",
+            },
+            {
+              icon: Cpu,
+              title: "Free, local intelligence",
+              text: "The default offline guide uses prepared prompts and word matching. Optional SmolLM2 runs through WebLLM in your browser. It requires a model download, WebGPU, and sufficient memory; no paid inference service or API key is used.",
+            },
+            {
+              icon: HeartHandshake,
+              title: "Support, with honest limits",
+              text: "Vihaara is not a therapist, a medical device, a diagnosis tool, or an emergency service. AI can misunderstand you or generate incorrect advice. Persistent or concerning symptoms deserve qualified professional care.",
+            },
+          ].map(({ icon: Icon, title, text }) => (
+            <section key={title}>
+              <Icon size={23} className="text-primary mb-3" />
+              <h2 className="text-xl mb-2">{title}</h2>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                {text}
+              </p>
+            </section>
+          ))}
+        </div>
       </div>
-      
-      <Card className="mb-6 border border-primary/10 shadow-md">
-        <CardContent className="p-6">
-          <p className="text-lg text-muted-foreground mb-6 leading-relaxed">
-            Vihaara — derived from Sanskrit, meaning lifestyle or mindful dwelling — is your personal sanctuary for mental clarity and emotional well-being. Inspired by ancient concepts of balance and modern intelligence, Vihaara blends the wisdom of mindful living with the power of advanced AI.
-          </p>
-          
-          <h2 className="text-xl font-semibold font-heading mb-4">Our Mission</h2>
-          <p className="text-muted-foreground mb-6">
-            Our mission is simple: To provide a private, intelligent, and comforting space for daily self-care, reflection, and emotional support — without judgment, tracking, or cloud storage.
-          </p>
-          
-          <p className="text-muted-foreground mb-6">
-            Whether you're journaling your thoughts, checking in on your mood, or seeking health and wellness tips, Vihaara is designed to meet you with calm, insight, and compassion — every single day.
-          </p>
-          
-          <div className="flex items-center space-x-3 mb-4">
-            <div className="bg-primary/10 p-3 rounded-full shadow-inner">
-              <i className="fas fa-lock text-primary"></i>
-            </div>
-            <div>
-              <h3 className="font-medium font-heading">Privacy First</h3>
-              <p className="text-sm text-muted-foreground">All your data stays on your device. Nothing is sent to the cloud.</p>
-            </div>
-          </div>
-          
-          <div className="flex items-center space-x-3">
-            <div className="bg-purple-100 dark:bg-purple-900/30 p-3 rounded-full shadow-inner">
-              <i className="fas fa-brain text-purple-500"></i>
-            </div>
-            <div>
-              <h3 className="font-medium font-heading">AI-Powered Insights</h3>
-              <p className="text-sm text-muted-foreground">Advanced AI helps you understand patterns and provides personalized guidance.</p>
-            </div>
-          </div>
-          
-          <div className="mt-8 text-center">
-            <p className="italic text-lg font-medium text-primary/90 font-heading">"Live gently. Think clearly. Feel deeply."</p>
-          </div>
-        </CardContent>
-      </Card>
-      
-      <Card className="mb-6 border border-primary/10 shadow-md">
-        <CardContent className="p-6">
-          <h2 className="text-xl font-semibold font-heading mb-5 flex items-center">
-            <div className="w-2 h-8 bg-gradient-to-b from-primary to-secondary rounded-full mr-2"></div>
-            How Vihaara Works
-          </h2>
-          
-          <div className="space-y-6">
-            <div className="flex p-3 hover:bg-muted/20 rounded-lg transition-colors">
-              <div className="flex-shrink-0 h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary shadow-inner">1</div>
-              <div className="ml-4">
-                <h3 className="font-medium font-heading">Journal Your Thoughts</h3>
-                <p className="text-sm text-muted-foreground">Write down your feelings and experiences. Vihaara's AI will analyze the emotions and provide insights.</p>
-              </div>
-            </div>
-            
-            <div className="flex p-3 hover:bg-muted/20 rounded-lg transition-colors">
-              <div className="flex-shrink-0 h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary shadow-inner">2</div>
-              <div className="ml-4">
-                <h3 className="font-medium font-heading">Track Your Mood</h3>
-                <p className="text-sm text-muted-foreground">Log your daily mood with simple emoji selections. Discover patterns over time.</p>
-              </div>
-            </div>
-            
-            <div className="flex p-3 hover:bg-muted/20 rounded-lg transition-colors">
-              <div className="flex-shrink-0 h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary shadow-inner">3</div>
-              <div className="ml-4">
-                <h3 className="font-medium font-heading">Chat with Your AI</h3>
-                <p className="text-sm text-muted-foreground">Have supportive conversations with Vihaara's AI assistant for guidance and mental wellness tips.</p>
-              </div>
-            </div>
-            
-            <div className="flex p-3 hover:bg-muted/20 rounded-lg transition-colors">
-              <div className="flex-shrink-0 h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-primary shadow-inner">4</div>
-              <div className="ml-4">
-                <h3 className="font-medium font-heading">Receive Daily Tips</h3>
-                <p className="text-sm text-muted-foreground">Get personalized wellness suggestions based on your mood patterns and journal content.</p>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-      
-      <Card className="border border-primary/10 shadow-md">
-        <CardContent className="p-6">
-          <h2 className="text-xl font-semibold font-heading mb-5 flex items-center">
-            <div className="w-2 h-8 bg-gradient-to-b from-secondary to-primary rounded-full mr-2"></div>
-            Privacy Commitment
-          </h2>
-          <p className="text-muted-foreground mb-6">
-            Vihaara runs entirely in your browser. Your journal entries, conversations, and mood data are stored only on your device using localStorage. We have no servers collecting your information, no accounts to create, and no data being shared with third parties.
-          </p>
-          <div className="bg-yellow-50 dark:bg-yellow-900/20 p-4 rounded-lg border border-yellow-200 dark:border-yellow-900/30">
-            <div className="flex">
-              <div className="flex-shrink-0">
-                <i className="fas fa-exclamation-triangle text-yellow-500"></i>
-              </div>
-              <div className="ml-3">
-                <h3 className="text-sm font-medium text-yellow-800 dark:text-yellow-300 font-heading">Important Note</h3>
-                <p className="text-xs text-yellow-700 dark:text-yellow-400 mt-1">
-                  While Vihaara provides support for emotional well-being, it is not a substitute for professional mental health care. If you're experiencing a mental health crisis, please contact a healthcare professional.
-                </p>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      <section className="border rounded-2xl p-7 mb-5">
+        <h2 className="text-2xl mb-3">What “local” means</h2>
+        <ul className="list-disc pl-5 space-y-3 text-sm text-muted-foreground leading-relaxed">
+          <li>
+            Your writing is processed on this device. No journal, mood, or chat
+            text is sent to a remote AI endpoint.
+          </li>
+          <li>
+            Loading the website still contacts its hosting provider. Enabling AI
+            downloads public model files from Hugging Face and the WebLLM model
+            library host; those hosts see ordinary connection information, but
+            are not sent your conversations.
+          </li>
+          <li>
+            After the production app finishes caching, its core tools can reopen
+            offline. AI needs its model and runtime files cached too. Browsers
+            may evict cached files, and private browsing may not retain your
+            data.
+          </li>
+          <li>
+            Use Settings to export or clear your personal data and remove the
+            downloaded model. Exported files are also unencrypted. Clearing
+            browser storage removes your saved entries.
+          </li>
+        </ul>
+        <Link href="/settings" className="primary-link mt-5">
+          Manage your data →
+        </Link>
+      </section>
+      <section className="border rounded-2xl p-7">
+        <h2 className="text-2xl mb-3">Care beyond the screen</h2>
+        <p className="text-sm text-muted-foreground leading-relaxed">
+          If you are in immediate danger or think you might harm yourself or
+          someone else, contact local emergency services or go to the nearest
+          emergency department. Ask someone you trust to stay with you if you
+          can. This app cannot reliably detect a crisis or replace human
+          support.
+        </p>
+        <h3 className="text-lg mt-6 mb-2">Further reading</h3>
+        <p className="text-sm text-muted-foreground">
+          Our breathing and stress resources draw on general self-care guidance.
+          Use a comfortable pace and stop if an exercise feels uncomfortable.
+        </p>
+        <div className="flex flex-wrap gap-4 mt-4 text-sm underline">
+          <a
+            href="https://www.nhs.uk/mental-health/self-help/guides-tools-and-activities/breathing-exercises-for-stress/"
+            target="_blank"
+            rel="noreferrer"
+          >
+            NHS: comfortable breathing
+          </a>
+          <a
+            href="https://www.nhs.uk/every-mind-matters/mental-health-issues/stress/"
+            target="_blank"
+            rel="noreferrer"
+          >
+            NHS: everyday stress
+          </a>
+          <a href="https://webllm.mlc.ai/" target="_blank" rel="noreferrer">
+            About WebLLM
+          </a>
+        </div>
+      </section>
     </div>
   );
-};
-
-export default About;
+}

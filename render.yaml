@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: vihaara
+    runtime: static
+    buildCommand: npm ci && npm run build:static
+    staticPublishPath: dist/public
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    headers:
+      - path: /sw.js
+        name: Cache-Control
+        value: no-cache

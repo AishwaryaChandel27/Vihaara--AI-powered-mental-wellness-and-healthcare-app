@@ -1,53 +1,63 @@
-import { ChatMessage, MoodEntry } from '@/types';
-
-async function apiCall(endpoint: string, data: any) {
-  const response = await fetch(endpoint, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(data),
-  });
-
-  if (!response.ok) {
-    const error = await response.text();
-    throw new Error(`API error: ${response.status} - ${error}`);
-  }
-
-  return response.json();
+// Compatibility facade: existing callers keep their interfaces; personal text never goes to a server.
+import type { ChatMessage, MoodEntry } from "@/types";
+import { generateLocal } from "./local-ai";
+import {
+  guidedReply,
+  healthTips,
+  journalReflection,
+  moodSummary,
+  needsUrgentSupport,
+  techniques,
+  tips,
+  urgentMessage,
+} from "./wellness";
+export async function getAiJournalAnalysis(content: string) {
+  const fallback = journalReflection(content);
+  if (needsUrgentSupport(content)) return fallback;
+  const result = await generateLocal(
+    [{ role: "user", content }],
+    "Offer one tentative reflection and one open question about this journal entry. Do not infer a diagnosis.",
+  );
+  return {
+    ...fallback,
+    insights: result
+      ? `On-device AI reflection · ${result}`
+      : fallback.insights,
+  };
 }
-
-// Journal analysis function
-export async function getAiJournalAnalysis(journalContent: string) {
-  const result = await apiCall('/api/ai/analyze-journal', { content: journalContent });
-  return result;
+export async function getMoodInsightAnalysis(entries: MoodEntry[]) {
+  return moodSummary(entries);
 }
-
-export async function getMoodInsightAnalysis(moodEntries: MoodEntry[]) {
-  const result = await apiCall('/api/ai/mood-insights', { entries: moodEntries });
-  return result.insights;
-}
-
 export async function getAiChatResponse(
   messages: ChatMessage[],
   tone: string,
-  responseLength: number
+  length: number,
 ) {
-  const result = await apiCall('/api/ai/chat', { messages, tone, responseLength });
-  return result.response;
+  const text = messages.filter((m) => m.role === "user").at(-1)?.content || "";
+  if (needsUrgentSupport(text)) return urgentMessage;
+  if (
+    /medicat|diagnos|dose|bipolar|schizophren|hallucin|voices|poison|chest pain/i.test(
+      text,
+    )
+  )
+    return guidedReply(messages, tone, length);
+  return (
+    (await generateLocal(
+      messages,
+      `Use a ${tone === "clinical" ? "clear and practical" : tone === "spiritual" ? "gentle and mindful" : "warm and friendly"} tone. Write ${length === 1 ? "two short sentences" : length === 3 ? "up to three short paragraphs" : "one short paragraph and one question"}.`,
+    )) ?? guidedReply(messages, tone, length)
+  );
 }
-
-export async function getDailyWellnessTip(tone: string) {
-  const result = await apiCall('/api/ai/daily-tip', { tone });
-  return result.tip;
+let tipIndex = new Date().getDate() % tips.length;
+export async function getDailyWellnessTip(_tone: string) {
+  return tips[tipIndex++ % tips.length];
 }
-
-export async function getAiHealthAdvice(category: string, tone: string) {
-  const result = await apiCall('/api/ai/health-advice', { category, tone });
-  return result.advice;
+export async function getAiHealthAdvice(category: string, _tone: string) {
+  return healthTips[category] || healthTips.general;
 }
-
-export async function getAiMentalPeaceTechnique(category: string, tone: string) {
-  const result = await apiCall('/api/ai/mental-peace', { category, tone });
-  return result.technique;
+export async function getAiMentalPeaceTechnique(
+  category: string,
+  _tone: string,
+) {
+  return techniques[category] || techniques.mindfulness;
 }
